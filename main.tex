@@ -1,0 +1,1280 @@
+\documentclass[12pt,a4paper,oneside,openany]{book}
+
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{times}
+\usepackage[left=3cm,right=2cm,top=2.5cm,bottom=2.5cm]{geometry}
+\usepackage{url}
+\usepackage{placeins}
+\usepackage{booktabs}
+\usepackage{enumitem}
+\usepackage{indentfirst}
+\linespread{1.3}
+\frenchspacing
+\setlist{itemsep=0pt}
+\setlist{nolistsep}
+
+\begin{document}
+\thispagestyle{empty}
+
+% ---- Logo + Programme ----
+\begin{center}
+    \includegraphics[scale=0.3]{sgh_full.png}
+
+    \vspace{1cm}
+
+    Programme: Master’s study
+\end{center}
+
+\vspace{1cm}
+
+% ---- Field of Study / Specialization ----
+\noindent Field of study: Advanced Analytics -- Big Data\\[0.4cm]
+
+\vspace{1.2cm}
+
+% ---- Name and Student ID (Right Aligned) ----
+\begin{flushright}
+Name and surname: Mengzhen Shang\\
+\end{flushright}
+
+\vspace{1.5cm}
+
+
+
+% ---- Title ----
+\begin{center}
+    {\LARGE\bfseries
+    Explainable Housing Price Prediction \\[0.2cm]
+    Using Random Forest and Neural Networks: \\[0.2cm]
+    Evidence from the Ames Housing Dataset\\[0.2cm]
+    }
+\end{center}
+
+\vspace{1.5cm}
+
+% ---- Thesis Type + Supervisor (Right Aligned) ----
+\begin{flushright}
+Master's thesis\\
+written at the Institute of Econometrics\\
+Warsaw School of Economics\\
+under the supervision of\\
+Dr Grzegorz Koloch
+\end{flushright}
+
+\vfill
+
+\begin{center}
+    Warsaw, 2026
+\end{center}
+
+\clearpage 
+
+\clearpage
+
+\thispagestyle{empty}
+
+\mbox{}
+
+\clearpage
+
+
+% ---- Table of Contents ----
+
+\tableofcontents
+
+\clearpage
+
+
+\chapter{Introduction}
+
+Housing price prediction is an important task in real estate markets because property values affect many financial and personal decisions. For households, a reliable price estimate can support buying, selling, and negotiation decisions. For financial institutions, housing valuation is closely related to mortgage underwriting, collateral assessment, and credit risk management. For real estate platforms and investors, price prediction can support listing strategies, market comparison, and investment screening. Public institutions may also use housing price information to understand affordability, spatial inequality, and local market development. Therefore, housing price prediction is not only a technical forecasting problem, but also a practical business analytics problem.
+
+However, housing price prediction remains difficult. Property prices are influenced by many factors at the same time, including size, quality, age, renovation status, location, neighborhood characteristics, and market conditions. These relationships are often nonlinear and heterogeneous. For example, an additional square meter of living area may not have the same value for every house. Its effect may depend on overall quality, neighborhood, house type, or market segment. Similarly, the value of a garage, basement, or renovation may vary across different properties. This makes housing valuation more complex than a simple linear pricing problem.
+
+Traditional housing price models, especially hedonic regression models, are useful because they are relatively easy to interpret. They can show how different housing characteristics are associated with property prices. However, they may be less flexible when the data contain nonlinear relationships, interaction effects, and a large number of categorical variables. Modern machine learning methods can address some of these challenges because they are able to model more complex patterns in structured data. Tree-based models, boosting methods, and neural networks are commonly used for prediction tasks where the relationships between variables are not purely linear.
+
+At the same time, higher predictive power does not automatically make a model suitable for practical use. In housing valuation, users often need to understand why a model produces a certain predicted price. This is especially important when model outputs may influence mortgage decisions, investment choices, listing prices, or automated valuation systems. A model that produces accurate predictions but cannot explain them may be difficult to trust, audit, or communicate to non-technical stakeholders. Therefore, interpretability is an important requirement in housing price prediction.
+
+This issue is closely related to explainable artificial intelligence (XAI). XAI methods aim to make machine learning models more understandable by showing how features contribute to predictions. In this thesis, SHAP (SHapley Additive exPlanations) is used as the main interpretability method. SHAP can provide both global explanations, which show the overall importance of features, and local explanations, which explain individual predictions. This is useful for housing price prediction because it allows the analysis to examine whether model predictions are based on meaningful housing characteristics such as total floor area, overall quality, garage capacity, living area, and property age.
+
+This thesis uses the Ames Housing dataset as the empirical basis for the analysis. The dataset contains detailed structured information about residential properties, including structural, quality-related, locational, and sale-related variables. After preprocessing, feature engineering, and one-hot encoding, the dataset becomes a high-dimensional tabular dataset suitable for comparing different machine learning models. The study focuses mainly on the comparison between Random Forest and a Neural Network model, while Linear Regression, Ridge Regression, and XGBoost are included as benchmark models to provide additional reference points for predictive performance.
+
+The motivation for this research comes from the trade-off between predictive accuracy and interpretability. A highly accurate model is useful, but in business and financial settings, accuracy alone is not enough. A model should also provide explanations that are stable, understandable, and consistent with housing valuation logic. This thesis therefore investigates not only which model predicts housing prices more accurately, but also which model provides more useful explanations for practical decision-making.
+
+\section{Research Problem and Objectives}
+
+Despite the growing use of machine learning in real estate analytics, there remains a practical gap between model accuracy and model interpretability. Many machine learning models can improve prediction performance, but their internal logic may be difficult to explain. This creates a problem in housing valuation, where predictions may be used by stakeholders who need clear and trustworthy explanations.
+
+The problem is especially relevant in financial and business contexts. For example, a mortgage lender may need to know whether a property valuation is supported by reasonable housing characteristics or driven by unstable patterns in the data. A real estate platform may need to provide price recommendations that users can understand. Buyers and sellers may want to know which property features increase or decrease the estimated value. In these situations, the model explanation can be almost as important as the predicted price itself.
+
+The primary objective of this thesis is to evaluate whether explainable machine learning can support reliable and interpretable housing price prediction using structured tabular data. The study compares different models in terms of predictive performance, but it also examines whether their predictions can be explained in a meaningful way. Particular attention is given to Random Forest and Neural Network models because they represent different learning approaches and different levels of model complexity.
+
+Random Forest was selected as the main tree-based model because it is widely used for structured tabular data and can capture nonlinear relationships while remaining relatively interpretable through feature importance and SHAP analysis. The Neural Network model was included as a more flexible and higher-complexity approach. Comparing these two models helps evaluate whether greater model complexity leads to better performance and whether such complexity improves or weakens interpretability. Linear Regression, Ridge Regression, and XGBoost were included as benchmark models to provide broader context for the predictive results.
+
+More specifically, this thesis addresses the following research questions:
+
+\begin{enumerate}
+    \item How accurately can different machine learning models predict housing prices using the Ames Housing dataset after preprocessing and feature engineering?
+    
+    \item How does the tuned Random Forest model compare with the Neural Network model in terms of predictive performance and generalization?
+    
+    \item How do benchmark models, including Linear Regression, Ridge Regression, and XGBoost, perform relative to the two main models of the study?
+    
+    \item Which housing characteristics are most important in explaining model predictions, according to SHAP-based global and local explanations?
+    
+    \item Does the Random Forest model provide stable and economically meaningful explanations for individual housing price predictions?
+    
+    \item How robust is the Random Forest model when an important engineered feature, \textit{TotalSF}, is removed from the feature set?
+    
+    \item What are the practical implications of explainable housing price models for stakeholders such as banks, real estate platforms, buyers, sellers, and analysts?
+\end{enumerate}
+
+These research questions reflect the main purpose of the thesis: to move beyond simple model benchmarking and examine the practical value of explainable machine learning in housing price prediction. The study therefore evaluates model performance, interpretability, robustness, and business relevance together.
+
+\section{Contributions of the Thesis}
+
+This thesis contributes to the field of real estate analytics and explainable machine learning in several ways.
+
+First, the study provides a comparative evaluation of several predictive models on the same preprocessed housing dataset. The comparison includes Linear Regression, Ridge Regression, XGBoost, Random Forest, and Neural Network models. This allows the analysis to examine not only the performance of the two main models, Random Forest and Neural Network, but also how they compare with simpler and stronger benchmark models.
+
+Second, the thesis shows that the most accurate model is not always the most useful model for explainable decision-making. In the empirical results, XGBoost achieved the best predictive performance on the hold-out test set. However, Random Forest provided clearer and more economically meaningful SHAP explanations. This distinction is important because the thesis focuses on explainable machine learning, not only on minimizing prediction error.
+
+Third, the study provides evidence that higher model complexity does not necessarily improve performance on medium-sized structured tabular data. The Neural Network model performed poorly despite hyperparameter tuning and regularization. The simplified Neural Network also failed to improve performance. This negative result is still informative because it shows that flexible models must be matched with the size, structure, and feature representation of the dataset.
+
+Fourth, the thesis applies SHAP analysis to examine both global and local model behavior. The global SHAP results identify the main drivers of housing price predictions, while the local SHAP explanations show how individual predictions are formed. This provides a more detailed understanding of model behavior than performance metrics alone. In particular, the Random Forest explanations show that the model relies mainly on meaningful housing characteristics such as \textit{TotalSF}, \textit{OverallQual}, garage-related variables, living area, and property age.
+
+Fifth, the study includes a robustness check by removing the engineered variable \textit{TotalSF}, which was identified as the most important Random Forest feature. The results show that Random Forest performance remained almost unchanged after this feature was removed. This suggests that the model did not depend entirely on one engineered variable and could recover similar information from related housing characteristics. This strengthens the interpretation of Random Forest as a stable model for this dataset.
+
+Finally, the thesis contributes a business analytics perspective to housing price prediction. It discusses how explainable models can support different stakeholders, including mortgage lenders, real estate platforms, buyers, sellers, investors, and public institutions. The study argues that explainability is not only a technical feature, but also a practical requirement for communication, trust, review, and responsible decision-making in housing valuation.
+
+\section{Structure of the Thesis}
+
+The remainder of this thesis is organized as follows. Chapter 2 reviews the literature on housing price prediction, machine learning methods for structured tabular data, and explainable artificial intelligence. Chapter 3 describes the Ames Housing dataset, exploratory data analysis, missing value treatment, outlier handling, feature engineering, and preprocessing steps. Chapter 4 presents the methodological framework, including the selected predictive models, benchmark models, training and validation strategy, evaluation metrics, and SHAP-based interpretability approach. Chapter 5 reports the empirical results. It compares the predictive performance of all models, analyzes the weak performance of the Neural Network, presents global and local SHAP explanations, and conducts a robustness check by removing \textit{TotalSF}. Chapter 6 discusses the main findings, explains the differences in model performance, presents the business implications of explainable housing price prediction, outlines the limitations of the study, suggests directions for future research, and concludes the thesis.
+
+
+
+\chapter{Literature Review}
+
+Housing price prediction has long been a central topic in economics, real estate finance, and urban analytics. With the increasing availability of high-dimensional datasets and advances in machine learning, modern predictive models offer substantially improved accuracy compared with traditional hedonic approaches. However, growing methodological complexity has intensified concerns regarding transparency and interpretability, especially in regulatory and financial decision-making contexts. This chapter reviews the evolution of housing price modeling, recent advances in machine learning for real estate prediction, and the emergence of explainable artificial intelligence (XAI) methods such as SHAP. The goal is to provide a comprehensive theoretical and empirical foundation for evaluating predictive performance alongside explanation reliability in real estate automated valuation systems.
+
+\section{Traditional Housing Price Models}
+
+The foundational framework for housing price analysis is the hedonic pricing model, which decomposes property prices into the implicit value of structural, locational, and neighborhood attributes. Baranzini (2010) provides a comprehensive overview of hedonic approaches, emphasizing the economic interpretation of attribute-level marginal prices and the importance of housing characteristics such as size, quality, and environmental amenities. Hedonic models are widely used due to their interpretability and theoretical grounding in consumer utility maximization.
+
+However, classical hedonic regressions typically impose restrictive assumptions, including linearity, additivity, and limited interactions among attributes. These assumptions constrain the model’s ability to capture nonlinear relationships and complex feature interactions commonly observed in real estate markets. Moreover, traditional econometric models often struggle with omitted variable bias, spatial dependence, and high-dimensional feature spaces.
+
+Thanos, Dub\'e, and Legros (2019) address several of these limitations by integrating the comparable sales approach within a spatiotemporal hedonic framework. Their work demonstrates the importance of accounting for spatial structure and temporal trends when estimating location value---a finding particularly relevant for markets with heterogeneous neighborhood dynamics.
+
+Collectively, traditional housing models provide strong interpretability but remain limited in capturing complex nonlinear interactions in high-dimensional housing datasets.
+
+\section{Machine Learning Approaches for Housing Price Prediction}
+
+Machine learning techniques have gained prominence for real estate valuation due to their ability to model nonlinear relationships, complex interactions, and high-dimensional inputs. Among these methods, tree-based models have shown particular effectiveness for structured tabular datasets.
+
+XGBoost, introduced by Chen and Guestrin (2016), has become a dominant algorithm in housing price prediction. Its regularized objective function, efficient tree boosting, and sparsity-aware split finding yield superior predictive performance in many real estate applications. XGBoost’s structural bias toward piecewise constant functions aligns naturally with typical housing features, such as categorical conditions, neighborhood groupings, and construction quality.
+
+Sergoyan and Bezirganyan (2022) compare multiple machine learning methods for apartment valuation and demonstrate that Random Forests and Gradient Boosting outperform neural networks in both accuracy and stability. Their results reinforce a broader trend in the literature: for tabular real estate data, tree ensembles frequently outperform deep neural networks unless extensive feature engineering or large-scale data are available.
+
+The theoretical reasons behind this performance gap are addressed by Xu et al. (2021), who explain why deep networks often underperform decision forests at small and medium sample sizes. Their analysis highlights that decision forests exploit the ``low effective dimensionality'' of tabular data by partitioning feature space efficiently, whereas neural networks require larger sample sizes to generalize well. This distinction suggests that tree-based models and neural networks may respond differently to medium-sized structured tabular datasets, particularly under limited sample conditions.
+
+Recent studies have also emphasized the importance of integrating richer contextual features into predictive models. Neves, Aparicio, and Neto (2024) show that adding open city data---such as accessibility, environmental conditions, and neighborhood amenities---to gradient boosting models significantly improves predictive accuracy and provides more interpretable variable effects. Their results underscore the practical relevance of feature engineering and contextual data integration.
+
+Overall, modern machine learning methodologies deliver robust empirical benchmarking capacities. However, their internal complexity often reduces transparency and interpretability in practical financial applications, presenting a significant operational challenge for regulated financial applications.
+
+\section{Explainable Artificial Intelligence in Housing Price Modeling}
+
+Explainable artificial intelligence (XAI) has become essential for housing price prediction due to the need for transparency in financial valuation, regulatory compliance, and policy evaluation. Recent review studies have also highlighted the growing importance of explainability in automated property valuation systems. For example, Maselli and Nesticò (2025) provide a comprehensive review of machine learning and explainable artificial intelligence techniques in property valuation, emphasizing the increasing demand for transparent and interpretable valuation models. SHAP (SHapley Additive exPlanations) has emerged as one of the most widely used model-agnostic tools in the literature to decipher complex model behaviors.
+
+\subsection{SHAP for Global and Local Interpretation}
+
+SHAP assigns additive feature attributions inspired by cooperative game theory, offering consistent, locally accurate explanations for individual predictions. Bachmann (2025) applies SHAP across linear models, decision trees, and XGBoost to analyze rental prices in Germany. Their results show that tree-based models capture complex nonlinear effects while providing stable global feature importance rankings when analyzed with SHAP. Similarly, Sergoyan and Bezirganyan (2022) use SHAP to explain model behavior in automated real estate valuation. Their analysis confirms that SHAP visualizations can uncover subtle interactions between location and structural features, enhancing model interpretability.
+
+However, existing studies predominantly rely on isolated, static SHAP visualizations based on a single, finalized model architecture. A critical gap remains in understanding the \textit{explainability consistency gap}---that is, the unresolved problem of how stable and robust these feature importance rankings remain when the underlying data structure or model architecture is systematically perturbed.
+
+\subsection{Interaction Constraints and Locational Value}
+
+A notable methodological development is the introduction of interaction constraints in gradient boosting models. Stalder et al. (2025) combine XGBoost with SHAP interaction values to isolate the ``pure locational component'' of house prices by preventing interactions between location variables and structural attributes during model training. This approach significantly reduces omitted-variable bias and produces interpretable decompositions of housing value, offering an important conceptual bridge between modern machine learning and traditional hedonic principles. 
+
+Yet, while Stalder et al. (2025) actively manipulate the model's internal structure to isolate variables, the broader real estate XAI literature rarely performs systematic robustness diagnostics---such as targeted feature omission tests---to verify if the generated explanations remain stable when important input features are modified or removed.
+
+\subsection{SHAP vs.\ Causal Interpretations}
+
+A recent line of research addresses whether SHAP values reflect causal effects or merely predictive associations. Arshad et al. (2024) compare SHAP-based variable importance with EconML causal estimators and find only moderate correlation between the two. Their results caution that SHAP identifies predictive contribution rather than structural causality, an important distinction for policy interpretation and model transparency. Because SHAP identifies statistical associations rather than immutable causal laws, the vulnerability of these explanations to data-level perturbations remains a prominent methodological issue that compromises the long-term reliability of automated explanations.
+
+\section{Ensemble Frameworks, Optimization, and the Robustness Gap}
+
+Several studies propose hybrid frameworks combining ensemble learning, optimization, and explainability. Hussain et al. (2025) develop a transparent valuation pipeline using ensemble models with genetic algorithm--based hyperparameter tuning and ANOVA-style feature analysis. Their approach highlights the trend toward optimizing both performance and interpretability simultaneously. Similarly, Revathi and Devarajan (2025) integrate XGBoost with SHAP into a robust ensemble-based valuation system, emphasizing the practical need for explainable predictions in real estate deployment scenarios. These studies demonstrate that modern machine learning workflows increasingly incorporate interpretability as a core design principle rather than an afterthought.
+
+Despite these advancements in integrating XAI into production pipelines, existing frameworks heavily prioritize baseline predictive accuracy and the initial generation of explanatory plots. Relatively few studies critically investigate the robustness of the generated explanations under intentional feature perturbation or sudden architectural shifts, leaving an open \textit{robustness gap} in the existing automated valuation literature.
+
+\section{Summary of Identified Gaps and Thesis Contribution}
+
+A systematic review of the literature reveals three distinct empirical and practical questions that remain unanswered in current housing valuation studies:
+\begin{enumerate}
+    \item \textbf{Underexamined Model Failures on Tabular Data:} While tree ensembles are widely preferred over neural networks for structured data, the specific reasons why deep models fail on medium-sized datasets are rarely evaluated through formal diagnostics, such as learning curves or localized parameter reduction.
+    \item \textbf{Unverified Consistency of Model Explanations:} Most applications of XAI frameworks assume that feature importance rankings are stable properties of the data itself. There is a lack of comparative research analyzing whether and how these rankings change when the same dataset is processed by fundamentally different model classes.
+\item \textbf{Absence of Stress Testing for Attributions:} Existing real estate studies evaluate SHAP values statically using a single finalized model. They rarely test the resilience of these explanations under altered data conditions, such as the complete removal of a dominant predictor variable.
+
+\end{enumerate}
+
+This thesis directly addresses these three gaps through a structured empirical framework. Using the Ames housing dataset, we train a Random Forest model and a neural network model under identical validation constraints.
+
+Instead of relying solely on baseline accuracy metrics, this study conducts three specific diagnostic tests to evaluate model behavior and explanation stability. First, we use learning curves and architectural reduction experiments to analyze how overfitting develops under different neural network configurations. Second, we compare the global and local SHAP profiles of both models to evaluate how model architecture influences feature attribution patterns. Third, we perform a feature sensitivity analysis by removing the top engineered feature (\textit{TotalSF}) to observe how the remaining features redistribute feature importance across the remaining variables. Through these parallel tests, this study provides an empirical assessment of both prediction reliability and explanation stability in automated property valuation.
+
+
+\chapter{Data and Preprocessing}
+
+\section{Dataset Description}
+
+The dataset used in this study is the Kaggle competition dataset \textit{House Prices: Advanced Regression Techniques}, which is based on the Ames Housing dataset developed by Dean De Cock. It provides detailed information on residential properties, including structural characteristics, location, quality, and sale conditions.
+
+The dataset contains 1,460 observations and 80 explanatory variables. The target variable is \textit{SalePrice}, which represents the sale price of each property.
+
+To provide a macro-level understanding of the dataset's numerical distributions, Table \ref{tab:desc_stats} summarizes the descriptive statistics for a selected subset of key continuous and ordinal variables.
+
+\begin{table}[htbp]
+\centering
+\caption{Descriptive Statistics of Key Housing Variables}
+\label{tab:desc_stats}
+\begin{tabular}{lrrrrrr}
+\toprule
+\textbf{Feature} & \textbf{Count} & \textbf{Mean} & \textbf{Std Dev} & \textbf{Min} & \textbf{Median} & \textbf{Max} \\
+\midrule
+SalePrice & 1,460 & 180,921.20 & 79,442.50 & 34,900.0 & 163,000.0 & 755,000.0 \\
+GrLivArea & 1,460 & 1,515.46 & 525.48 & 334.0 & 1,464.0 & 5,642.0 \\
+TotalBsmtSF & 1,460 & 1,057.43 & 438.71 & 0.0 & 991.5 & 6,110.0 \\
+1stFlrSF & 1,460 & 1,162.63 & 386.59 & 334.0 & 1,087.0 & 4,692.0 \\
+LotArea & 1,460 & 10,516.83 & 9,981.26 & 1,300.0 & 9,478.5 & 215,245.0 \\
+YearBuilt & 1,460 & 1971.27 & 30.20 & 1872.0 & 1973.0 & 2010.0 \\
+OverallQual & 1,460 & 6.10 & 1.38 & 1.0 & 6.0 & 10.0 \\
+OverallCond & 1,460 & 5.58 & 1.11 & 1.0 & 5.0 & 9.0 \\
+GarageArea & 1,460 & 472.98 & 213.80 & 0.0 & 480.0 & 1,418.0 \\
+TotRmsAbvGrd & 1,460 & 6.52 & 1.63 & 2.0 & 6.0 & 14.0 \\
+\bottomrule
+\textit{Source: Own elaboration.}
+\end{tabular}
+\end{table}
+
+
+A closer examination of these statistics reveals several important characteristics of the Ames housing market. First, the target variable, \textit{SalePrice}, exhibits a substantial standard deviation (\$79,442.50) and a significant rightward skew, as evidenced by the mean (\$180,921.20) noticeably exceeding the median (\$163,000.0). This pattern indicates the presence of high-value properties that pull the average upward, necessitating logarithmic transformation to stabilize variance during model training.
+
+Furthermore, structural area variables such as \textit{LotArea} display extreme maximum values (e.g., 215,245 sq.ft. compared to a median of 9,478.5 sq.ft.), highlighting the necessity for robust outlier detection. Finally, the minimum value of zero for features like \textit{TotalBsmtSF} and \textit{GarageArea} represents structural absences (i.e., properties constructed without basements or garages) rather than randomly missing data. This distinction is important because it determines how missing values should be handled during preprocessing.
+
+The variables can be broadly categorized into three groups: structural features (e.g., living area and number of rooms), locational features (e.g., neighborhood), and quality-related attributes (e.g., overall material and finish quality). Based on domain knowledge and prior housing valuation studies, variables such as \textit{GrLivArea}, \textit{OverallQual}, and \textit{TotalSF} are expected to be important predictors of housing prices.
+
+Overall, the dataset provides a rich and diverse set of features, making it highly suitable for applying machine learning techniques to housing price prediction.
+
+
+\section{Exploratory Data Analysis}
+
+Exploratory data analysis was conducted to better understand the distribution, relationships, and underlying data quality issues within the dataset prior to applying machine learning algorithms.
+
+\subsection{Missing Value Diagnostics and Structural Missingness}
+
+Before addressing outlier detection and variable distributions, it is essential to evaluate the completeness of the dataset. Figure \ref{fig:missing_values} illustrates the percentage of missing data for all features containing at least one null value.
+
+\FloatBarrier
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{figure/C3/figure_3_0.png}
+    \caption{Percentage of missing values across affected features. Features such as \textit{PoolQC}, \textit{MiscFeature}, \textit{Alley}, and \textit{Fence} exhibit extreme missing rates exceeding 80\%.}
+    \textit{Source: Own elaboration.}
+    \label{fig:missing_values}
+\end{figure}
+
+
+As depicted in the figure, a small subset of variables exhibits exceptionally high missing rates. Most notably, \textit{PoolQC} (Pool Quality), \textit{MiscFeature}, \textit{Alley}, and \textit{Fence} are missing in over 80\% of the observations. From a statistical and domain perspective, many of these missing values reflect structural omission rather than random missingness.
+
+In the context of real estate data, a missing \textit{PoolQC} or \textit{GarageType} value does not indicate a failure in data collection or an unknown attribute; rather, it structurally signifies the physical absence of a pool or a garage on the property. Recognizing this missing pattern is vital for maintaining data integrity. Simply dropping these columns due to high missingness would result in a substantial loss of predictive information, while imputing them with a statistical mean or mode would introduce severe mathematical bias. This finding guides the imputation strategy applied in the preprocessing stage, where such structural absences are explicitly encoded to preserve their economic meaning.
+
+\subsection{Outlier Detection and Distribution Skewness}
+
+Following the missing value assessment, bivariate analysis was conducted to identify extreme observations. 
+
+First, as shown in Figure~\ref{fig:outliers}, properties with extremely large living areas tend to have disproportionately low sale prices.
+
+\FloatBarrier
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.85\textwidth]{figure/C3/figure_3_1.png}
+    \caption{Properties with extremely large living areas and relatively low sale prices, suggesting the presence of potential outliers.}
+    \textit{Source: Own elaboration.}
+    \label{fig:outliers}
+\end{figure}
+
+These observations indicate the presence of outliers that should be addressed during preprocessing.
+
+\medskip
+
+Second, as shown in Figure~\ref{fig:log_transform}, the target variable exhibits a strong right-skewed distribution, which may violate model assumptions and reduce prediction accuracy.
+
+\FloatBarrier
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.85\textwidth]{figure/C3/figure_3_2.png}
+    \caption{The distribution of SalePrice is highly right-skewed before transformation but becomes more symmetric after log transformation, improving suitability for regression modeling.}
+    \textit{Source: Own elaboration.}
+    \label{fig:log_transform}
+\end{figure}
+
+This transformation helps stabilize variance and enhances model performance.
+
+\medskip
+
+Furthermore, as shown in Figure~\ref{fig:lotfrontage}, the distribution of LotFrontage is right-skewed, with most properties having relatively small frontage values.
+
+\FloatBarrier
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{figure/C3/figure_3_3.png}
+    \caption{LotFrontage is right-skewed, with most properties having relatively small frontage and a long tail of larger values, supporting the use of median imputation.}
+    \textit{Source: Own elaboration.}
+    \label{fig:lotfrontage}
+\end{figure}
+
+This pattern is not unique to LotFrontage, as similar skewness is observed across several other numerical variables, highlighting the need for robust preprocessing techniques.
+
+\subsection{Feature Correlation and Multicollinearity}
+
+To further uncover the linear relationships between the predictors and the target variable, as well as to detect potential redundancies among the features, a Pearson correlation analysis was conducted. Figure \ref{fig:corr_heatmap} visualizes the correlation matrix for the top numerical features most strongly associated with \textit{SalePrice}.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1.0\textwidth]{figure/C3/figure_3_corr.png}
+    \caption{Pearson correlation heatmap of the top numerical features. The matrix reveals strong positive correlations with the target variable, as well as significant multicollinearity among certain predictor pairs (e.g., \textit{GarageCars} and \textit{GarageArea}).}
+    \textit{Source: Own elaboration.}
+    \label{fig:corr_heatmap}
+\end{figure}
+
+The heatmap provides two main insight. First, it confirms economic intuition regarding value drivers: \textit{OverallQual} (Overall Quality, $r=0.79$) and \textit{GrLivArea} (Above Grade Living Area, $r=0.71$) exhibit the highest positive correlations with housing prices, making them among the strongest predictors.
+
+Second, and more importantly from a methodological standpoint, the matrix exposes significant \textbf{multicollinearity} within the dataset. Several predictor pairs exhibit exceptionally high correlation coefficients: \textit{GarageCars} and \textit{GarageArea} ($r=0.88$), \textit{GrLivArea} and \textit{TotRmsAbvGrd} ($r=0.83$), and \textit{TotalBsmtSF} and \textit{1stFlrSF} ($r=0.82$). In traditional Ordinary Least Squares (OLS) regression, such severe multicollinearity would inflate the variance of the coefficient estimates, rendering the model highly unstable and the economic interpretations unreliable. 
+
+The identification of this highly collinear structure provides further motivation for the methodological choices discussed in Chapter 4. Tree-based ensemble models such as Random Forest can reduce the influence of correlated predictors through feature sub-sampling and aggregation, while neural networks may require additional regularization to handle redundant high-dimensional inputs effectively. These observations support the use of machine learning approaches that can better accommodate multicollinearity and complex feature interactions than traditional linear models.
+
+\subsection{Impact of Categorical Attributes: Tiers and Heteroscedasticity}
+
+While numerical features such as living area provide continuous baseline valuations, property pricing is also strongly influenced by quality ratings and locational characteristics. Figure \ref{fig:boxplots} illustrates the distribution of original \textit{SalePrice} across discrete levels of \textit{OverallQual} and various \textit{Neighborhoods}.
+
+\FloatBarrier
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\textwidth]{figure/C3/figure_3_boxplot.png}
+    \caption{Boxplots of SalePrice against \textit{OverallQual} and \textit{Neighborhood}. The distributions in the original price scale reveal clear valuation tiers, non-linear step increments, and severe heteroscedasticity at higher quality levels and premium locations.}
+    \textit{Source: Own elaboration.}
+    \label{fig:boxplots}
+\end{figure}
+
+The visual analysis of these categorical features reveals an important structural pattern in the Ames housing market: \textbf{discretized pricing tiers}. In the quality-price relationship, each incremental increase in the \textit{OverallQual} score yields a non-linear, step-like jump in the median sale price. Furthermore, the spread of the boxplots widens significantly at higher quality tiers (e.g., scores 8 to 10). This indicates pronounced \textit{heteroscedasticity}, where luxury properties exhibit substantially greater price variance and market volatility than entry-level homes. Similarly, the neighborhood plot, sorted by median price, demonstrates substantial locational premiums. Premium enclaves such as \textit{NoRidge} and \textit{NridgHt} establish distinctly higher price floors and variance compared to more tightly clustered, lower-tier neighborhoods.
+
+From a methodological standpoint, identifying these sharp, non-linear boundaries is crucial for model selection. \textbf{Ensemble tree-based models}, such as Random Forest, are well suited to capturing these discrete jumps because their underlying splitting mechanism partitions the feature space into axis-aligned hyperrectangles. A threshold split (e.g., separating an \textit{OverallQual} of 7 from 8) naturally creates an effective threshold-based decision rule. 
+
+Conversely, \textbf{Neural Networks} generally attempt to approximate relationships using smooth, continuous functions. Standard feedforward neural networks may face additional challenges when modeling sharp, step-like categorical boundaries in small or medium-sized tabular datasets without sufficient data, careful regularization, or more specialized encoding strategies. Consequently, these characteristics make the dataset suitable for comparing tree-based models and neural network architectures in the empirical analysis.
+
+\medskip
+
+All these observations highlight key characteristics of the data that need to be addressed before applying machine learning models. These findings motivate the preprocessing steps described in the next section.
+
+\section{Data Preprocessing}
+
+Based on the findings from the exploratory data analysis, several preprocessing steps were applied to ensure data quality and prepare the dataset for machine learning ingestion.
+
+\subsection{Data Cleaning and Transformation}
+First, the identifier variable \textit{Id} was removed as it contains no predictive information. Subsequently, based on the bivariate analysis, severe outliers were excluded---specifically, observations with extremely large living areas but unusually low sale prices---to prevent these anomalies from disproportionately influencing model estimation.
+
+Next, the target variable \textit{SalePrice} was log-transformed ($\ln(1+x)$) to reduce right-skewness and stabilize the variance across different pricing tiers. This transformation produces a more symmetric distribution and helps reduce heteroscedasticity in regression-based models.
+
+Missing values were handled based on the structural missingness patterns identified during the exploratory data analysis. For categorical variables where missingness indicated structural absence (e.g., no garage, no pool), the value ``None'' was explicitly encoded. For numerical variables related to these absences (e.g., \textit{GarageArea}, \textit{TotalBsmtSF}), missing values were replaced with zero. In cases of genuinely missing numerical data with skewed distributions (e.g., \textit{LotFrontage}), median imputation was employed to ensure robustness against outliers, while the mode was utilized for categorical variables with minimal missing values.
+
+\subsection{Feature Engineering}
+To extract more economically meaningful signals from the raw data, domain-driven feature engineering was performed. To better capture the chronological depreciation and renovation premium of a property, absolute years were converted into relative age metrics:
+
+\begin{equation}
+HouseAge = YrSold - YearBuilt
+\end{equation}
+
+\begin{equation}
+RemodAge = YrSold - YearRemodAdd
+\end{equation}
+
+Furthermore, spatial features were aggregated to better represent overall usable living space. In real estate markets, buyers often evaluate properties based on total usable living space rather than separate floor measurements. Therefore, a comprehensive area metric was engineered:
+
+\begin{equation}
+TotalSF = TotalBsmtSF + 1stFlrSF + 2ndFlrSF
+\end{equation}
+
+This aggregation serves two practical purposes. First, it reduces feature redundancy and mitigates the multicollinearity inherent in separated floor measurements (as observed in the correlation heatmap). Second, it creates a compact feature that captures overall property size, which is expected to be strongly associated with housing prices. The influence of this engineered feature is further examined in Chapter 5 through a feature omission analysis.
+
+\subsection{Categorical Encoding and the Curse of Dimensionality}
+Finally, the dataset was verified to ensure no missing values remained. Categorical variables were then transformed using one-hot encoding, with one category dropped (dummy variable trap prevention) to avoid strict multicollinearity. 
+
+While analytically necessary, this encoding expanded the feature space significantly. The final preprocessed dataset consisted of 1,458 observations and 261 predictor variables. The resulting feature matrix is high-dimensional and relatively sparse due to one-hot encoding. Such a structure may increase model complexity and introduce challenges related to the curse of dimensionality. In particular, the relatively low observation-to-feature ratio may affect the generalization ability of high-capacity neural networks, while tree-based ensemble models are often less sensitive to redundant high-dimensional inputs.
+
+
+\chapter{Methodology}
+
+\section{Overview}
+
+This chapter presents the machine learning methods used for housing price prediction based on the Ames housing dataset. The analysis focuses on comparing different predictive models and evaluating their performance on structured real estate data.\footnote{
+Large language models (ChatGPT and Gemini) were used as supportive tools for language editing, grammar correction, code assistance, and programming-related troubleshooting. The research design, data preprocessing, model implementation, empirical analysis, interpretation of results, and conclusions were conducted and validated by the author.
+}
+
+The study compares several predictive approaches, with particular attention given to Random Forest and Neural Network models. In addition, several benchmark models are included to provide comparative reference points.
+
+To improve model reliability, hyperparameter tuning and cross-validation are applied during training. Model performance is evaluated using multiple regression metrics, including RMSE, MAE, and $R^2$.
+
+Finally, SHAP-based interpretability analysis is conducted to better understand how different housing features influence model predictions.
+
+
+
+\section{Predictive Models}
+
+This study mainly focuses on two machine learning models: Random Forest and Neural Network. These two approaches were selected because they represent different learning mechanisms and levels of model complexity.
+
+Random Forest is a tree-based ensemble model that is widely used for structured tabular data. It is known for its robustness, relatively stable performance, and interpretability. In contrast, Neural Networks are more flexible models that can learn complex nonlinear relationships through layered transformations. However, they are also more sensitive to feature dimensionality, dataset size, and optimization settings.
+
+By comparing these two models, this study aims to examine how different machine learning approaches perform in housing price prediction tasks. In addition, several benchmark models were included to provide reference points for comparison.
+
+
+\subsection{Random Forest}
+
+Random Forest is an ensemble learning algorithm that combines multiple decision trees to improve prediction accuracy and reduce overfitting. Instead of relying on a single tree, the model generates many trees and averages their predictions, which generally leads to more stable results.
+
+Random Forest is particularly suitable for housing price prediction because housing data is highly structured and contains many nonlinear relationships and feature interactions. Variables such as property size, quality, location, and renovation status may influence prices in different ways, and Random Forest is well suited to capturing these patterns.
+
+One advantage of Random Forest is its ability to model nonlinear relationships without requiring strict assumptions about data distributions. The model is also relatively robust to multicollinearity, outliers, and noisy variables, which are common in housing datasets.
+
+Random Forest is based on the principle of Bootstrap Aggregating (Bagging). During training, multiple bootstrap samples are generated from the original training set using sampling with replacement. A separate decision tree is then trained on each sample. The final prediction is calculated as the average of all tree predictions:
+
+\begin{equation}
+\hat{y} = \frac{1}{B} \sum_{b=1}^{B} T_b(x)
+\end{equation}
+
+where $T_b(x)$ represents the prediction from the $b$-th tree and $B$ is the total number of trees.
+
+In addition to bootstrap sampling, Random Forest introduces randomness during feature selection. At each split, only a subset of variables is considered. This helps reduce the correlation between trees and improves the robustness of the model.
+
+Another practical advantage of Random Forest is that it does not require feature scaling before training, which makes preprocessing simpler compared with some other machine learning methods.
+
+The detailed hyperparameter tuning process for Random Forest is presented later in Section 4.3.
+
+
+\subsection{Neural Network}
+
+A Multi-Layer Perceptron (MLP) Neural Network was implemented to evaluate the performance of deep learning methods on the Ames housing dataset.
+
+Neural Networks are flexible models that can learn complex nonlinear relationships through multiple layers of transformations. In housing price prediction, this allows the model to capture interactions among structural, locational, and categorical variables that may not be fully represented by simpler approaches.
+
+Compared with tree-based models, Neural Networks generally require more careful optimization and preprocessing. Their performance is often sensitive to dataset size, feature dimensionality, and parameter settings. In this study, the Ames dataset contains a relatively large number of encoded variables after one-hot encoding but a limited number of observations, which may increase the risk of overfitting and unstable generalization.
+
+The implemented model is a Multi-Layer Perceptron consisting of an input layer, several hidden layers, and one output layer for predicting the log-transformed housing price. As illustrated in Figure~\ref{fig:nn_architecture}, a decreasing hidden-layer structure was used to gradually compress information and learn higher-level feature representations.
+
+
+\begin{figure}[H]
+
+    \centering
+
+    \includegraphics[width=1\textwidth]{figure/C4/figure_4_1.png}
+
+    \caption{Architecture of the Multi-Layer Perceptron (MLP) used for housing price prediction.}
+
+    \textit{Source: Own elaboration.}
+    
+    \label{fig:nn_architecture}
+
+\end{figure}
+
+
+The hidden layers use the Rectified Linear Unit (ReLU) activation function:
+
+\begin{equation}
+\sigma(x) = \max(0, x)
+\end{equation}
+
+ReLU was selected because it improves optimization efficiency and helps reduce the vanishing gradient problem during training.
+
+Model parameters were optimized using the Adam optimizer, which adaptively adjusts learning rates during backpropagation. Compared with standard stochastic gradient descent, Adam usually provides faster and more stable convergence for high-dimensional problems.
+
+Because Neural Networks are sensitive to feature scales, all input variables were standardized before training using \texttt{StandardScaler} before training. In addition, regularization techniques including $L_2$ penalties and early stopping were applied to reduce overfitting. Early stopping terminates training when validation performance no longer improves after several iterations, helping prevent the model from fitting noise in the training data.
+
+Although Neural Networks are theoretically powerful models, previous studies have shown that they do not always outperform tree-based methods on medium-sized tabular datasets. This study therefore evaluates whether the additional complexity of Neural Networks leads to improved performance in housing price prediction.
+
+The detailed tuning process and parameter selection are discussed later in Section 4.3.
+
+
+\subsection{Benchmark Models}
+
+In addition to Random Forest and Neural Network, several benchmark models were included to provide reference points for comparison.
+
+Linear Regression was first implemented as a traditional baseline model. The model assumes a linear relationship between the predictors and the target variable and estimates coefficients using ordinary least squares (OLS). Although relatively simple, it provides a useful benchmark for evaluating whether more complex machine learning methods actually improve predictive performance.
+
+Ridge Regression was then included to address potential multicollinearity among predictors. Compared with standard Linear Regression, Ridge Regression adds an $L_2$ regularization term to the loss function, which helps stabilize coefficient estimates and reduce overfitting. This is particularly relevant because the housing dataset contains many correlated variables after one-hot encoding.
+
+XGBoost was also included as an additional ensemble benchmark because of its strong performance on structured tabular datasets. Unlike Random Forest, which builds trees independently through Bagging, XGBoost constructs trees sequentially to correct errors made by previous trees. This often improves predictive accuracy, although it also increases model complexity and sensitivity to parameter tuning.
+
+Including these benchmark models allows the study to compare different learning approaches, ranging from traditional linear models to more advanced ensemble and deep learning methods.
+
+
+\section{Model Training and Validation}
+
+After preprocessing, the dataset was divided into training and testing subsets in order to evaluate model performance on unseen data. Model training, parameter tuning, and validation were conducted separately to reduce the risk of overfitting and to ensure a fair comparison among different machine learning approaches.
+
+\subsection{Train-Test Split and Hyperparameter Tuning}
+
+After preprocessing and outlier removal, the final dataset contained 1,458 observations and 261 predictor variables. The dataset was divided into a training set and a testing set using an 80:20 ratio. The training set was used for model fitting and hyperparameter tuning, while the testing set was reserved for final model evaluation.
+
+The split was performed using the \texttt{train\_test\_split()} function from \texttt{scikit-learn} with \texttt{random\_state = 42} to ensure reproducibility. Keeping a separate hold-out test set allows the models to be evaluated on unseen observations rather than on the same data used during training.
+
+Hyperparameter tuning was conducted for both Random Forest and Neural Network models using \texttt{GridSearchCV} with 5-fold cross-validation on the training set. This design ensures that the test set remains independent and is only used for final performance evaluation.
+
+For Random Forest, the tuning process focused on the number of trees, maximum tree depth, and minimum sample requirements for splitting and leaf nodes. The following parameter grid was tested:
+
+\begin{itemize}
+    \item \texttt{n\_estimators}: 100, 200, 300, 400
+    \item \texttt{max\_depth}: 6, 10, 15, None
+    \item \texttt{min\_samples\_split}: 2, 5, 10
+    \item \texttt{min\_samples\_leaf}: 1, 2, 5
+\end{itemize}
+
+The best-performing Random Forest configuration was:
+
+\begin{itemize}
+    \item \texttt{n\_estimators = 400}
+    \item \texttt{max\_depth = None}
+    \item \texttt{min\_samples\_split = 2}
+    \item \texttt{min\_samples\_leaf = 2}
+\end{itemize}
+
+This configuration achieved the lowest cross-validation RMSE of 0.1367.
+
+For the Neural Network, hyperparameter tuning was conducted within a pipeline that combined \texttt{StandardScaler} and \texttt{MLPRegressor}. This ensured that feature scaling was performed only within the training folds during cross-validation. The tuning process examined different hidden-layer structures, learning rates, and regularization strengths:
+
+\begin{itemize}
+    \item Hidden layer structures: $(32)$, $(64)$, $(128)$, $(128,64)$, $(128,64,32)$
+    \item Learning rates: 0.001, 0.0005, 0.0001
+    \item $L_2$ regularization parameter (\texttt{alpha}): 0.001, 0.01
+\end{itemize}
+
+The best Neural Network configuration was:
+
+\begin{itemize}
+    \item \texttt{hidden\_layer\_sizes = (128, 64, 32)}
+    \item \texttt{alpha = 0.001}
+    \item \texttt{learning\_rate\_init = 0.001}
+\end{itemize}
+
+However, despite hyperparameter tuning and regularization, the Neural Network still produced relatively poor cross-validation performance, with a CV RMSE of 1.2310. This result suggests that the model struggled to generalize effectively on the housing dataset.
+
+\subsection{Cross-Validation and Evaluation Metrics}
+
+After hyperparameter tuning, 5-fold cross-validation was applied to the tuned Random Forest and Neural Network models on the training set. Cross-validation helps reduce the dependence on a single train-test split by repeatedly training and validating the model on different subsets of the data. In this study, the training set was divided into five folds using \texttt{KFold} cross-validation with shuffling enabled and \texttt{random\_state = 42}. This allowed each model to be evaluated across several validation subsets before final testing on the hold-out test set.
+
+Model performance was evaluated using three standard regression metrics: Root Mean Squared Error (RMSE), Mean Absolute Error (MAE), and the coefficient of determination ($R^2$). These metrics were used during both cross-validation and final model evaluation on the unseen test set.
+
+RMSE measures the square root of the average squared prediction error:
+
+\begin{equation}
+RMSE = \sqrt{\frac{1}{n}\sum_{i=1}^{n}(y_i-\hat{y}_i)^2}
+\end{equation}
+
+Because RMSE squares the residuals before averaging, it gives larger penalties to large prediction errors.
+
+MAE measures the average absolute prediction error:
+
+\begin{equation}
+MAE = \frac{1}{n}\sum_{i=1}^{n}|y_i-\hat{y}_i|
+\end{equation}
+
+Compared with RMSE, MAE is less sensitive to extreme prediction errors and therefore provides a more direct interpretation of average model accuracy.
+
+The coefficient of determination ($R^2$) measures the proportion of variance explained by the model:
+
+\begin{equation}
+R^2 = 1 - \frac{\sum_{i=1}^{n}(y_i-\hat{y}_i)^2}{\sum_{i=1}^{n}(y_i-\bar{y})^2}
+\end{equation}
+
+Higher $R^2$ values indicate better explanatory performance, while negative values indicate that the model performs worse than predicting the mean target value.
+
+All evaluation metrics were calculated using the log-transformed \texttt{SalePrice}, since the target variable was transformed during preprocessing to reduce skewness.
+
+Table~\ref{tab:cv_results} presents the average 5-fold cross-validation results for the tuned Random Forest and Neural Network models.
+
+\begin{table}[H]
+\centering
+\caption{5-Fold Cross-Validation Results}
+\label{tab:cv_results}
+
+\begin{tabular}{lcccccc}
+\toprule
+& \multicolumn{2}{c}{RMSE} 
+& \multicolumn{2}{c}{MAE} 
+& \multicolumn{2}{c}{$R^2$} \\
+
+\cmidrule(lr){2-3}
+\cmidrule(lr){4-5}
+\cmidrule(lr){6-7}
+
+Model & Mean & Std & Mean & Std & Mean & Std \\
+\midrule
+
+Tuned Random Forest 
+& 0.1367 & 0.0131 
+& 0.0949 & 0.0095 
+& 0.8805 & 0.0084 \\
+
+Tuned Neural Network 
+& 1.2310 & 0.3696 
+& 0.7746 & 0.0573 
+& -9.0161 & 5.0959 \\
+
+\bottomrule
+\textit{Source: Own elaboration.}
+\end{tabular}
+\end{table}
+
+The results show that Random Forest achieved relatively stable and accurate predictions across different folds, with low standard deviations across all evaluation metrics. In contrast, the Neural Network produced substantially larger prediction errors and much higher variability, indicating unstable generalization performance. The negative $R^2$ value for the Neural Network suggests that its predictions were worse than simply using the mean housing price as a baseline estimator.
+
+
+\section{Model Interpretability and Robustness}
+
+In addition to predictive accuracy, this study also considers model interpretability and robustness. This is important in housing price prediction because model outputs should not only be accurate, but also explainable in terms of housing characteristics such as size, quality, age, and location.
+
+SHAP (SHapley Additive exPlanations) was used as the main interpretability method. SHAP explains a prediction by assigning each feature a contribution value. A positive SHAP value increases the predicted housing price, while a negative SHAP value decreases it. This makes it possible to examine both the overall importance of variables and the explanation of individual predictions.
+
+For a given prediction, the SHAP explanation can be written as:
+
+\begin{equation}
+f(x) = E[f(x)] + \sum_{i=1}^{M} \phi_i
+\end{equation}
+
+where $E[f(x)]$ is the average model prediction, $\phi_i$ is the SHAP value of feature $i$, and $M$ is the number of features. In this study, SHAP values were calculated for both global and local interpretation.
+
+First, global SHAP summary plots were used to identify the most important predictors in the model. This allows the analysis to examine whether the model relies on economically meaningful variables, such as total floor area, overall quality, garage size, and property age. For Random Forest, SHAP was applied directly to the trained tree-based model. For the Neural Network, SHAP was calculated using a smaller background sample because Kernel-based SHAP explanations are computationally expensive for high-dimensional data.
+
+Second, local SHAP explanations were used to examine individual prediction cases. Three representative observations were selected from the test set: the best prediction case, the worst prediction case, and a typical prediction case close to the median absolute error. This local analysis helps show how different housing characteristics contribute to specific model predictions, rather than only reporting average feature importance.
+
+To further diagnose the Neural Network model, the training loss curve was also examined. The purpose of this diagnostic plot was to check whether the model converged during training and whether there were signs of unstable optimization. This is useful because Neural Networks may produce poor generalization even when the training loss decreases smoothly.
+
+Finally, a feature omission robustness check was conducted for the Random Forest model. Since the engineered variable \textit{TotalSF} was expected to be an important predictor, the model was retrained after removing this feature from the dataset. The performance of the original Random Forest model was then compared with the model trained without \textit{TotalSF}. This test evaluates whether the model depends excessively on a single engineered variable or whether it can recover similar information from correlated housing features, such as basement area, first-floor area, and second-floor area.
+
+Together, these interpretability and robustness analyses provide a more complete evaluation of the models. They help assess not only which model predicts better, but also whether the predictions are based on meaningful housing characteristics and whether the model remains stable when an important engineered feature is removed.
+
+
+\chapter{Results}
+
+
+\section{Model Performance Comparison}
+
+This chapter presents the empirical results of the models described in the previous chapter. All models were evaluated on the same hold-out test set using RMSE, MAE, and $R^2$. The reported values are based on the log-transformed target variable, since \textit{SalePrice} was transformed during preprocessing.
+
+Table~\ref{tab:model_comparison} summarizes the final predictive performance of all models on the test set.
+
+\begin{table}[H]
+\centering
+\caption{XGBoost achieves the best overall test-set performance, but among the two main models of this study, Random Forest clearly outperforms the Neural Network, whose negative $R^2$ indicates poor generalization.}
+\label{tab:model_comparison}
+\begin{tabular}{lccc}
+\toprule
+Model & RMSE & MAE & $R^2$ \\
+\midrule
+Linear Regression & 0.1371 & 0.0934 & 0.8884 \\
+Ridge Regression & 0.1340 & 0.0917 & 0.8934 \\
+XGBoost & 0.1238 & 0.0852 & 0.9091 \\
+Tuned Random Forest & 0.1454 & 0.0975 & 0.8747 \\
+Tuned Neural Network & 0.9996 & 0.7119 & -4.9277 \\
+\bottomrule
+\textit{Source: Own elaboration.}
+\end{tabular}
+\end{table}
+
+Among all models, XGBoost achieved the best predictive performance, with the lowest RMSE of 0.1238 and the highest $R^2$ value of 0.9091. This result suggests that the boosting-based ensemble model was most effective in capturing the structure of the housing dataset.
+
+The linear models also performed strongly. Ridge Regression achieved an RMSE of 0.1340 and an $R^2$ value of 0.8934, slightly outperforming standard Linear Regression. This indicates that a substantial part of the variation in housing prices can be explained by additive relationships after preprocessing and one-hot encoding. The improvement of Ridge Regression over Linear Regression also suggests that regularization helped reduce the effect of multicollinearity among predictors.
+
+The tuned Random Forest model achieved an RMSE of 0.1454 and an $R^2$ value of 0.8747. Although it did not outperform XGBoost or Ridge Regression on the test set, it still provided stable predictive performance and explained a large share of the variation in housing prices. In the main comparison between the two primary models of this study, Random Forest clearly performed better than the Neural Network.
+
+The Neural Network performed poorly despite hyperparameter tuning and regularization. Its RMSE reached 0.9996, and its $R^2$ value was negative at -4.9277. This means that the Neural Network performed worse than a simple mean-based prediction on the test set. The result suggests that the model failed to learn stable and generalizable patterns from the medium-sized, high-dimensional tabular dataset.
+
+Overall, the results show that tree-based ensemble methods and regularized linear models were more suitable for this dataset than the Neural Network. XGBoost provided the best overall accuracy, while Random Forest remained useful because of its stable performance and later interpretability analysis.
+
+
+\section{Neural Network Diagnostic Analysis}
+
+Although the Neural Network was tuned using cross-validation, its final test performance remained weak. As shown in Table~\ref{tab:model_comparison}, the tuned Neural Network achieved an RMSE of 0.9996, an MAE of 0.7119, and a negative $R^2$ value of $-4.9277$ on the hold-out test set. This indicates that the model performed worse than a simple mean-based prediction and failed to generalize well to unseen observations.
+
+One possible reason is the structure of the dataset. After one-hot encoding, the input space contains 261 predictor variables, while the training set contains only 1,166 observations. This creates a relatively high-dimensional setting for a standard feedforward Neural Network. Although the tuned MLP architecture with hidden layers $(128,64,32)$ has enough capacity to learn complex patterns, the available sample size may not be sufficient for the model to learn stable relationships from sparse tabular features.
+
+To better understand the behavior of the Neural Network during training, the training loss curve was examined. Figure~\ref{fig:nn_loss} shows the evolution of the training loss across iterations.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.93\textwidth]{figure/C5/figure_5_6.png}
+    \caption{Training loss curve of the tuned Neural Network model, showing fast convergence but poor generalization on the test set.}
+    \textit{Source: Own elaboration.}
+    \label{fig:nn_loss}
+\end{figure}
+
+The loss curve decreases quickly during the early iterations and then becomes almost flat. This suggests that the optimization process itself was able to converge. Therefore, the poor test performance is unlikely to be caused simply by a failure of numerical optimization. Instead, the main issue appears to be poor generalization: the model was able to reduce training loss, but it did not transfer this learning effectively to unseen data.
+
+A simplified Neural Network was also tested to examine whether the poor performance was mainly caused by excessive model complexity. This simplified model used only one hidden layer with 32 neurons. The results are shown in Table~\ref{tab:simple_nn_comparison}.
+
+\begin{table}[H]
+\centering
+\caption{Comparison between the tuned and simplified Neural Network models: the simplified architecture performs substantially worse, indicating that the Neural Network's poor performance cannot be addressed by reducing model size alone.}
+\label{tab:simple_nn_comparison}
+\begin{tabular}{lccc}
+\toprule
+Model & RMSE & MAE & $R^2$ \\
+\midrule
+Tuned Neural Network $(128,64,32)$ & 0.9996 & 0.7119 & -4.9277 \\
+Simple Neural Network $(32)$ & 1.9980 & 1.2416 & -22.6805 \\
+\bottomrule
+\textit{Source: Own elaboration.}
+\end{tabular}
+\end{table}
+
+The simplified model performed even worse, with an RMSE of 1.9980 and an $R^2$ value of $-22.6805$. This result suggests that reducing the model size alone did not solve the generalization problem. The deeper tuned architecture still performed poorly, but the very small architecture appeared to lack enough capacity to capture useful pricing patterns.
+
+Taken together, these results suggest that the Neural Network difficulty was not caused by only one factor. The model was sensitive to the combination of limited sample size, high-dimensional one-hot encoded features, and heterogeneous housing characteristics. In this dataset, a standard MLP did not provide a good match for the tabular structure of the data.
+
+This result is also consistent with the broader performance comparison in Table~\ref{tab:model_comparison}. Tree-based and linear models performed much better than the Neural Network. Therefore, the poor Neural Network result should be interpreted as evidence that higher model complexity does not automatically lead to better prediction performance for medium-sized structured housing datasets.
+
+
+\section{Global SHAP Interpretability}
+
+To further examine how the models generated predictions, SHAP values were used to analyze global feature importance. The SHAP summary plots show both the magnitude and direction of each feature's contribution to the model output. Since the target variable was log-transformed, the SHAP values also represent contributions to the predicted log housing price.
+
+The purpose of this section is not only to rank variables by importance, but also to examine whether the models rely on features that are meaningful in housing valuation. This distinction is important for an explainable machine learning study. A model may achieve acceptable predictive accuracy while still relying on unstable, overly specific, or difficult-to-interpret patterns. In housing price prediction, such explanations would be less useful for practical decision-making, because users need to understand whether the predicted value is driven by reasonable housing characteristics such as size, quality, age, location, and functional attributes.
+
+Therefore, the SHAP results are used to assess both feature importance and the economic reasonableness of the model explanations. If the most influential variables are consistent with housing valuation logic, the model explanation becomes more trustworthy. If the model relies heavily on sparse categorical indicators or variables with less direct economic interpretation, this may suggest weaker explanatory reliability even when prediction accuracy appears acceptable. This section therefore compares the global SHAP patterns of the tuned Random Forest and Neural Network models to evaluate not only what each model predicts, but also how each model reaches its predictions.
+
+Figure~\ref{fig:shap_rf} presents the SHAP summary plot for the tuned Random Forest model. The most influential features are mainly structural and quality-related variables. In particular, \textit{TotalSF} and \textit{OverallQual} have the largest impact on model predictions. This is consistent with housing market intuition, since larger houses and higher-quality houses usually have higher sale prices.
+
+
+\FloatBarrier
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\textwidth]{figure/C5/figure_5_1.png}
+    \caption{Random Forest predictions are mainly driven by economically meaningful housing characteristics, especially total floor area and overall quality.}
+    \textit{Source: Own elaboration.}
+    \label{fig:shap_rf}
+\end{figure}
+
+The direction of the SHAP values is also meaningful. For \textit{TotalSF}, higher feature values are mostly associated with positive SHAP values, while lower values are associated with negative SHAP values. A similar pattern can be observed for \textit{OverallQual}. This suggests that the Random Forest model learned a stable and economically reasonable relationship between property size, quality, and housing price.
+
+Table~\ref{tab:shap_importance_rf} reports the top ten features ranked by mean absolute SHAP value. The results confirm that \textit{TotalSF} and \textit{OverallQual} dominate the model explanation. Other important variables include garage-related features, living area, house age, basement area, renovation age, year built, and lot area.
+
+\begin{table}[H]
+\centering
+\caption[Top 10 Random Forest features ranked by mean absolute SHAP value]
+{Top 10 Random Forest features ranked by mean absolute SHAP value: TotalSF and OverallQual dominate the Random Forest explanation, confirming that the model relies primarily on size and quality when predicting housing prices.}
+\label{tab:shap_importance_rf}
+\begin{tabular}{lc}
+\toprule
+Feature & Mean Absolute SHAP Value \\
+\midrule
+TotalSF & 0.1319 \\
+OverallQual & 0.1018 \\
+GarageCars & 0.0146 \\
+GarageArea & 0.0139 \\
+GrLivArea & 0.0129 \\
+HouseAge & 0.0109 \\
+BsmtFinSF1 & 0.0102 \\
+RemodAge & 0.0101 \\
+YearBuilt & 0.0098 \\
+LotArea & 0.0093 \\
+\bottomrule
+\textit{Source: Own elaboration.}
+\end{tabular}
+\end{table}
+
+Overall, the Random Forest explanation is concentrated on a small group of variables with clear economic meaning. This makes the model easier to interpret. The results suggest that the model mainly relies on property size, overall quality, garage capacity, and age-related information when predicting housing prices.
+
+Figure~\ref{fig:shap_nn} shows the SHAP summary plot for the tuned Neural Network. Compared with the Random Forest model, the Neural Network produces a more scattered feature importance pattern. Several one-hot encoded categorical variables appear among the most important features, including \textit{MasVnrType\_BrkFace}, \textit{MasVnrType\_None}, \textit{GarageType\_Detchd}, and \textit{Neighborhood\_NAmes}. Some structural variables, such as \textit{GrLivArea} and \textit{RemodAge}, are also important, but the overall pattern is less concentrated around the main housing value drivers.
+
+This difference is important because the Neural Network did not achieve strong predictive performance on the test set. Its SHAP pattern therefore should be interpreted with caution. The figure is not used to claim that these categorical variables are truly the strongest housing price determinants. Rather, it helps diagnose how the Neural Network distributed feature importance internally. Compared with the Random Forest model, the Neural Network appears to rely more on narrow categorical indicators and less on broad structural predictors such as total floor area and overall quality. This provides additional evidence that the model learned a less stable and less economically transparent representation of the housing data.
+
+
+\FloatBarrier
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\textwidth]{figure/C5/figure_5_2.png}
+    \caption{The Neural Network produces a more fragmented SHAP pattern, relying more on sparse categorical indicators than on the main structural value drivers.}
+    \textit{Source: Own elaboration.}
+    \label{fig:shap_nn}
+\end{figure}
+
+Table~\ref{tab:shap_importance_nn} summarizes the top ten features for the Neural Network based on mean absolute SHAP values. The ranking shows that the Neural Network places relatively high importance on categorical indicators related to masonry veneer type, garage type, neighborhood, pool quality, and exterior materials.
+
+\begin{table}[H]
+\centering
+\caption[Top 10 Neural Network features ranked by mean absolute SHAP value]
+{Top 10 Neural Network features ranked by mean absolute SHAP value: feature importance is spread across exterior materials, garage type, neighborhood, and amenities, suggesting less concentrated explanations than the Random Forest model.}
+\label{tab:shap_importance_nn}
+\begin{tabular}{lc}
+\toprule
+Feature & Mean Absolute SHAP Value \\
+\midrule
+MasVnrType\_BrkFace & 0.1516 \\
+RemodAge & 0.1209 \\
+GrLivArea & 0.1180 \\
+MasVnrType\_None & 0.1120 \\
+GarageType\_Detchd & 0.1070 \\
+Neighborhood\_NAmes & 0.1019 \\
+PoolQC\_Gd & 0.0963 \\
+Exterior2nd\_HdBoard & 0.0910 \\
+ExterQual\_TA & 0.0877 \\
+Exterior1st\_HdBoard & 0.0865 \\
+\bottomrule
+\textit{Source: Own elaboration.}
+\end{tabular}
+\end{table}
+
+This does not mean that the Neural Network explanation is meaningless. Some of the selected variables, such as \textit{GrLivArea}, \textit{RemodAge}, and \textit{ExterQual\_TA}, are related to housing quality and condition. However, the importance ranking is more fragmented than that of the Random Forest model. It relies more heavily on sparse categorical indicators, and the relationship between these variables and housing value is less direct.
+
+The comparison between the two SHAP analyses supports the earlier performance results. The Random Forest model produces explanations that are more consistent with standard housing valuation logic. In contrast, the Neural Network provides a less stable interpretation pattern, which is consistent with its weak predictive performance on the test set. Therefore, Random Forest is more useful than the Neural Network when both prediction accuracy and interpretability are considered.
+
+
+\section{Local SHAP Explanations for Random Forest}
+
+While the global SHAP analysis shows the overall importance of each feature, it does not explain how the model makes predictions for individual houses. Therefore, local SHAP waterfall plots were used to examine three representative observations from the test set.
+
+This section focuses on the tuned Random Forest model. The reason is that Random Forest showed much better test performance than the Neural Network and its global SHAP results were easier to interpret in housing market terms. Since the Neural Network failed to generalize well on the test set, its local explanations would be less useful for understanding reliable pricing patterns.
+
+The selected cases were based on the absolute prediction error of the tuned Random Forest model. The best case represents the observation with the smallest prediction error, the typical case is the observation whose error is closest to the median absolute error, and the worst case is the observation with the largest prediction error. This design allows the analysis to compare model behavior under different prediction conditions.
+
+
+\begin{table}[H]
+\centering
+\caption{Selected observations for local SHAP explanation}
+\label{tab:local_cases}
+\begin{tabular}{lc}
+\toprule
+Case Description & Observation Index \\
+\midrule
+Best Prediction Case & 1008 \\
+Typical Prediction Case & 679 \\
+Worst Prediction Case & 30 \\
+\bottomrule
+\textit{Source: Own elaboration.}
+\end{tabular}
+\end{table}
+
+\subsection{Best Prediction Case}
+
+Figure~\ref{fig:waterfall_best} presents the SHAP waterfall plot for the best prediction case. The model predicted a log-transformed house price of 12.388, starting from the average prediction value of 11.989.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.85\textwidth]{figure/C5/figure_5_3.png}
+    \caption[SHAP waterfall plot for the best prediction case]
+{SHAP waterfall plot for the best prediction case: large total floor area and relatively high overall quality push the prediction above the average, showing that the model gives a high valuation for economically meaningful reasons.}
+    \textit{Source: Own elaboration.}
+    \label{fig:waterfall_best}
+\end{figure}
+
+The explanation is consistent with housing valuation logic. The largest positive contribution comes from \textit{TotalSF = 3420}, which increases the predicted log-price by 0.19. This indicates that the large total floor area is the main reason for the high predicted value. \textit{OverallQual = 7} also has a strong positive effect, increasing the prediction by 0.14. Other variables, such as \textit{RemodAge}, \textit{GarageArea}, \textit{HouseAge}, \textit{YearRemodAdd}, and \textit{LotArea}, make smaller positive contributions.
+
+At the same time, a few variables slightly reduce the prediction. For example, \textit{BsmtUnfSF} and \textit{BsmtFinSF1} have small negative effects. However, these negative contributions are much smaller than the positive effects of total floor area and overall quality. This explains why the final predicted value is well above the average prediction.
+
+Overall, this case shows that the Random Forest model gives a high valuation mainly because the property is large and has relatively good overall quality. The local explanation is easy to interpret and agrees with standard real estate intuition.
+
+\subsection{Typical Prediction Case}
+
+Figure~\ref{fig:waterfall_typical} shows the local explanation for the typical prediction case. The predicted log-price is 11.828, which is slightly below the average prediction value of 11.989.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.85\textwidth]{figure/C5/figure_5_4.png}
+    \caption[SHAP waterfall plot for the typical prediction case]
+{SHAP waterfall plot for the typical prediction case: moderate size and quality reduce the predicted value, while garage and basement features partly offset this effect.}
+    \textit{Source: Own elaboration.}
+    \label{fig:waterfall_typical}
+\end{figure}
+
+In this case, the prediction is mainly pulled downward by \textit{TotalSF = 1976} and \textit{OverallQual = 5}. \textit{TotalSF} reduces the predicted log-price by 0.09, while \textit{OverallQual} reduces it by 0.07. This suggests that the property is smaller and of lower quality than the houses that receive higher predicted values.
+
+Some features partly offset this downward effect. \textit{BsmtFinSF1} and \textit{GarageArea} both add about 0.02 to the prediction. \textit{BsmtUnfSF} and \textit{CentralAir\_Y} also contribute slightly positively. These positive effects indicate that the property still has some useful structural and functional characteristics.
+
+However, the positive effects are not large enough to fully offset the negative influence of lower total floor area and overall quality. As a result, the final prediction remains slightly below the average. This case shows how the model balances several moderate positive and negative signals when predicting a more ordinary property.
+
+\subsection{Worst Prediction Case}
+
+Figure~\ref{fig:waterfall_worst} presents the SHAP explanation for the worst prediction case. The model predicted a log-price of 11.465, which is far below the average prediction value of 11.989.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.85\textwidth]{figure/C5/figure_5_5.png}
+    \caption[SHAP waterfall plot for the worst prediction case]
+{SHAP waterfall plot for the worst prediction case: low total floor area, low overall quality, and missing central air conditioning jointly push the prediction far below the average.}
+    \textit{Source: Own elaboration.}
+    \label{fig:waterfall_worst}
+\end{figure}
+
+The waterfall plot shows that several unfavorable features pushed the prediction downward at the same time. The largest negative contribution comes from \textit{TotalSF = 1966}, which decreases the prediction by 0.16. \textit{OverallQual = 4} further reduces the prediction by 0.12. The absence of central air conditioning, represented by \textit{CentralAir\_Y = 0}, also has a clear negative effect of 0.05.
+
+Other variables also contribute to the low predicted value. \textit{OverallCond = 4}, \textit{HouseAge = 88}, \textit{YearBuilt = 1920}, \textit{GarageCars = 1}, \textit{RemodAge = 58}, and \textit{BsmtFinSF1 = 0} all reduce the prediction to some extent. Together, these variables describe an older property with limited size, lower quality, fewer modern amenities, and weaker structural characteristics.
+
+This case helps explain why the model produced a very low prediction. The model appears to penalize properties when several negative characteristics occur together. From a valuation perspective, this is understandable. However, because this is the worst prediction case, it also suggests that the model may underestimate some atypical houses if their value depends on factors not fully captured by the structured dataset, such as interior condition, special location advantages, or recent undocumented improvements.
+
+\subsection{Comparison Across Local Cases}
+
+The three local explanations show that the Random Forest model does not apply one fixed rule to all houses. Instead, it adjusts predictions according to the feature profile of each property.
+
+Across all three cases, \textit{TotalSF} and \textit{OverallQual} play a central role. In the best case, high values of these features strongly increase the predicted price. In the typical and worst cases, lower values of the same features push the prediction downward. This is consistent with the global SHAP results, where \textit{TotalSF} and \textit{OverallQual} were identified as the two most important predictors.
+
+The local explanations also show the value of examining individual predictions. For the best case, the model's decision is mainly driven by large size and good quality. For the typical case, the prediction results from a balance between negative size and quality effects and smaller positive structural features. For the worst case, several weak housing characteristics appear together and jointly pull the prediction far below the average.
+
+Overall, the local SHAP analysis supports the interpretability of the Random Forest model. It shows that the model's predictions are mostly based on meaningful housing characteristics. At the same time, the worst case highlights a limitation of structured housing data: some property-specific factors may not be fully observed in the dataset. This suggests that automated housing price models should be interpreted carefully, especially for atypical or low-quality properties.
+
+
+\section{Robustness Check}
+
+To further examine the stability of the tuned Random Forest model, a feature omission test was conducted. The engineered variable \textit{TotalSF} was removed from the feature set, and the Random Forest model was retrained using the same tuned parameter setting.
+
+This test was included because \textit{TotalSF} was identified as the most important feature in the global SHAP analysis. Since \textit{TotalSF} combines basement area, first-floor area, and second-floor area, it captures a large part of the total usable space of a house. If the model depended too heavily on this single engineered variable, removing it would be expected to cause a clear decline in predictive performance.
+
+Table~\ref{tab:stability_results} compares the original tuned Random Forest model with the model trained without \textit{TotalSF}. This is a relatively strict test because \textit{TotalSF} is not a minor variable. As shown in the global SHAP analysis, it has the largest average contribution to the Random Forest predictions. Therefore, if the model were highly dependent on this single engineered feature, removing it would likely produce a visible increase in prediction error. In contrast, a small performance change would suggest that the model is able to use alternative but related housing characteristics.
+
+\begin{table}[H]
+\centering
+\caption[Robustness check after removing TotalSF]
+{Robustness check after removing \protect\textit{TotalSF}: Random Forest performance remains almost unchanged, suggesting that the model does not rely exclusively on this single engineered feature.}
+\label{tab:stability_results}
+\begin{tabular}{lccc}
+\toprule
+Model Configuration & RMSE & MAE & $R^2$ \\
+\midrule
+Tuned Random Forest & 0.145357 & 0.097450 & 0.874665 \\
+Random Forest without \textit{TotalSF} & 0.145416 & 0.097459 & 0.874562 \\
+\bottomrule
+\textit{Source: Own elaboration.}
+\end{tabular}
+\end{table}
+
+The results show that removing \textit{TotalSF} had almost no effect on model performance. The RMSE changed only from 0.145357 to 0.145416, while the MAE changed from 0.097450 to 0.097459. The $R^2$ value decreased only slightly, from 0.874665 to 0.874562.
+
+The magnitude of this change is very small compared with the overall predictive performance of the model. In practical terms, the two models produce almost the same level of accuracy on the hold-out test set. This indicates that the removal of \textit{TotalSF} did not materially weaken the model's ability to predict housing prices.
+
+This small change suggests that the Random Forest model does not rely exclusively on \textit{TotalSF}. Instead, the model can recover similar information from other related variables, such as \textit{GrLivArea}, basement area variables, first-floor area, second-floor area, and garage-related features. This is reasonable because these variables are structurally related to the size and usable space of the property.
+
+This result is also consistent with the correlation structure of housing data. Total living space is closely related to several original variables, including above-ground living area, basement area, and floor-specific square footage. Because Random Forest can combine information from many correlated predictors, it can partially replace the missing information from \textit{TotalSF} using these related variables.
+
+The robustness check therefore supports the stability of the Random Forest model. Although \textit{TotalSF} is the most important individual predictor, the model still maintains almost the same level of predictive accuracy when this feature is removed. This indicates that the model uses a broader set of housing characteristics rather than depending on a single engineered feature.
+
+From a practical perspective, this result is useful for housing price prediction. In real-world property datasets, some engineered or aggregated variables may be unavailable or measured differently. A model that can maintain stable performance under feature removal is more reliable for practical valuation tasks.
+
+
+\chapter{Discussion}
+
+\section{Summary of Main Findings}
+
+This study examined the use of machine learning models for housing price prediction with a particular focus on explainability. The empirical analysis was based on the Ames Housing dataset after data cleaning, feature engineering, one-hot encoding, and log transformation of the target variable. Several models were compared on the same hold-out test set, including Linear Regression, Ridge Regression, XGBoost, tuned Random Forest, and tuned Neural Network models.
+
+The first main finding is that XGBoost achieved the strongest predictive performance on the hold-out test set. It obtained the lowest RMSE and MAE and the highest $R^2$ among all tested models. This result shows that boosting-based ensemble learning was highly effective for the structured housing dataset used in this study.
+
+The second main finding is that Ridge Regression also performed strongly. Its result was better than the tuned Random Forest model in terms of test-set RMSE and $R^2$. This suggests that, after preprocessing, log transformation, and one-hot encoding, many housing price patterns in the dataset can be captured by regularized additive relationships.
+
+The third main finding is that the tuned Random Forest model remained highly relevant despite not being the most accurate model. It achieved a reasonable level of predictive performance and produced clear SHAP-based explanations. The most important Random Forest features were \textit{TotalSF}, \textit{OverallQual}, \textit{GarageCars}, \textit{GarageArea}, and \textit{GrLivArea}. These variables are directly related to property size, construction quality, garage capacity, and living space, which makes the model explanation economically meaningful.
+
+The fourth main finding is that the Neural Network model performed poorly. The tuned Multi-Layer Perceptron produced a negative $R^2$ value on the hold-out test set, and the simplified Neural Network performed even worse. These results show that the Neural Network did not generalize effectively in this study.
+
+The SHAP analysis further supported the difference between Random Forest and Neural Network. Random Forest explanations were concentrated around broad structural and quality-related value drivers. In contrast, the Neural Network explanation was more fragmented and assigned high importance to several sparse categorical indicators. This difference matters because explainable housing price prediction requires not only accurate estimates, but also explanations that are understandable and consistent with housing valuation logic.
+
+The local SHAP analysis provided additional evidence of interpretability. For the best, typical, and worst Random Forest prediction cases, the model's local explanations were mainly driven by meaningful housing characteristics such as total floor area, overall quality, central air conditioning, house age, and garage-related variables. These case-level explanations showed how the model adjusted its predictions for different types of properties.
+
+Finally, the robustness check showed that the Random Forest model was not overly dependent on the engineered \textit{TotalSF} variable. After removing \textit{TotalSF}, model performance remained almost unchanged. This indicates that the model could recover similar information from related variables, such as \textit{GrLivArea}, basement area, floor-specific square footage, and garage-related features.
+
+Overall, the results support three main conclusions. First, XGBoost provided the best pure predictive performance. Second, Random Forest provided the strongest balance between accuracy, interpretability, and robustness. Third, the Neural Network did not generalize well under the implemented architecture and preprocessing strategy, providing evidence that higher model complexity does not necessarily improve performance on medium-sized structured housing datasets.These findings show that model choice in housing price prediction should depend not only on predictive accuracy, but also on explainability and practical reliability.
+
+
+\section{Discussion of Model Performance}
+
+The results show that predictive performance was strongly affected by the match between model structure and data structure. The Ames Housing dataset is a medium-sized tabular dataset with numerical, ordinal, and one-hot encoded categorical variables. It contains nonlinear relationships, correlated predictors, and segment-based pricing patterns. These characteristics help explain why different model families performed differently.
+
+The strong performance of XGBoost can be understood through its boosting mechanism. Unlike Random Forest, where trees are trained independently and then averaged, XGBoost builds trees sequentially. Each additional tree focuses on reducing the remaining errors from the previous trees. This makes the model especially effective when the target variable is influenced by many small interactions among features. In housing price prediction, such interactions are common. The effect of living area, for example, may depend on neighborhood, construction quality, and renovation status. Similarly, the value of a garage may differ across property types or price segments. A boosting model can capture these layered relationships more effectively than models that assume a simpler additive structure.
+
+At the same time, the XGBoost result should not be interpreted as making the other models irrelevant. In this thesis, XGBoost serves mainly as a strong predictive benchmark. It shows what level of test-set accuracy can be achieved by a powerful tree-based boosting method. However, the main purpose of the study is not only to minimize prediction error, but also to evaluate explainability in housing price prediction. For this reason, model usefulness must be judged by more than RMSE or $R^2$ alone. A model that is slightly less accurate may still be more useful in applied valuation settings if its predictions are easier to explain, audit, and communicate.
+
+The strong performance of the linear models is also informative. It suggests that the preprocessing steps made the data more suitable for regression-based learning. The log transformation of \textit{SalePrice} reduced skewness, while one-hot encoding allowed categorical housing attributes to enter the model as separate indicators. In addition, engineered variables such as \textit{TotalSF} summarized important structural information. As a result, a considerable part of the variation in housing prices could be captured through additive relationships. This does not mean that the housing market is purely linear. Rather, it suggests that careful preprocessing can make even relatively simple models competitive.
+
+Ridge Regression performed slightly better than ordinary Linear Regression because the dataset contains many correlated predictors. Housing variables are often naturally related to each other. For instance, total square footage, above-ground living area, basement area, garage area, and the number of rooms all describe different aspects of property size and capacity. In an unregularized linear model, this correlation can make coefficient estimates unstable. Ridge Regression reduces this instability by shrinking coefficients through an $L_2$ penalty. This helps explain why the regularized linear model performed well in the final comparison.
+
+The Random Forest result should be interpreted differently from the XGBoost and Ridge results. Its value in this thesis does not come from being the most accurate model. Instead, its value comes from combining acceptable predictive accuracy with stable and meaningful explanations. This is important because housing price prediction is not only a technical forecasting problem. In many practical settings, users need to know why a model produced a certain valuation. The SHAP results showed that Random Forest relied mainly on broad and interpretable housing characteristics, such as total floor area, overall quality, garage capacity, living area, and property age. These features are easy to connect with real estate valuation logic.
+
+The slightly weaker predictive performance of Random Forest compared with XGBoost is also reasonable from a modeling perspective. Random Forest uses bagging to reduce variance. This makes the model robust, but it does not directly correct previous errors in the same way as boosting. Each tree contributes independently to the final average prediction. This averaging mechanism can produce stable results, but it may also smooth out some finer pricing patterns. XGBoost, by contrast, can focus more directly on difficult observations through its sequential learning process. This explains why XGBoost achieved higher accuracy, while Random Forest produced a more transparent and stable explanation profile.
+
+The Neural Network result provides a different lesson. It shows that theoretical flexibility does not guarantee empirical success. A Multi-Layer Perceptron can approximate complex nonlinear functions, but this advantage depends heavily on data size, feature representation, and optimization stability. In this study, the number of observations was limited relative to the number of encoded predictors. The one-hot encoded variables also produced a sparse input space. These conditions are not ideal for a standard feedforward Neural Network, which usually requires more data to learn stable internal representations.
+
+The poor performance of the Neural Network should therefore not be seen simply as a failed experiment. It is an informative result because it shows the limits of applying a standard MLP directly to a medium-sized tabular housing dataset. The model was able to reduce training loss, but it did not generalize well to the test set. This suggests that the network learned patterns that were specific to the training data rather than stable pricing relationships. The simplified Neural Network experiment further supports this interpretation. Reducing the model to one hidden layer did not improve performance, which means that the problem was not solved by reducing the number of neurons alone.
+
+This result also highlights the importance of feature representation. Tree-based models can handle mixed feature types and sparse categorical indicators more naturally because they split the data into local regions. Neural Networks, in contrast, process the input space through continuous weight updates. When many variables are binary indicators with uneven frequencies, the optimization process may become less stable and less informative. This helps explain why tree-based models and regularized linear models performed better than the Neural Network in this study.
+
+Taken together, the model comparison illustrates a practical complexity-performance trade-off. More complex models do not automatically produce better results. XGBoost performed best because its complexity was well matched to the structure of the data. Ridge Regression performed well because the preprocessing created strong additive signals and regularization controlled multicollinearity. Random Forest was useful because it combined nonlinear modeling with interpretable feature contributions. The Neural Network, despite its flexibility, was less suitable under the implemented architecture and feature representation.
+
+This discussion also shows why the "best" model depends on the decision context. If the only goal is predictive accuracy, XGBoost would be the strongest choice in this experiment. If the goal is transparent explanation and model communication, Random Forest becomes more attractive. If the goal is a simple and computationally efficient benchmark, Ridge Regression remains valuable. In real estate valuation, these objectives often coexist. A model may be used not only to predict a price, but also to support lending decisions, investment analysis, renovation planning, or automated valuation systems. In such cases, interpretability and robustness can be as important as small differences in prediction error.
+
+Therefore, the main implication of the model comparison is not that one algorithm is universally superior. Rather, the findings show that model choice should be guided by the structure of the dataset and the purpose of the analysis. For the Ames Housing dataset, boosting-based and regularized models achieved strong predictive performance, while Random Forest provided the clearest explainability profile. The Neural Network results show that high-capacity black-box models require careful justification when applied to medium-sized structured tabular data. This conclusion is directly related to the central theme of this thesis: explainable machine learning for housing price prediction requires both technical performance and interpretable model behavior.
+
+
+\section{Explainability and Business Implications}
+
+The results of this study show that predictive accuracy alone is not sufficient for evaluating machine learning models in housing price prediction. In a purely technical setting, the best model could be selected only by comparing RMSE, MAE, and $R^2$. From this perspective, XGBoost achieved the strongest predictive performance in this study. However, housing price prediction is not only a statistical problem. In many practical situations, predicted property values are used to support lending decisions, investment analysis, or automated valuation systems. In these cases, users often need to understand why the model produced a certain prediction, not only whether the prediction is accurate on average.
+
+This is where explainability becomes important. A housing price model may achieve strong predictive performance while relying on patterns that are difficult to interpret. Such a model may still be useful for internal forecasting tasks, but it may be less suitable for situations where transparency is required. The SHAP analysis in this study showed that the Random Forest model relied mainly on economically meaningful variables such as \textit{TotalSF}, \textit{OverallQual}, \textit{GarageCars}, \textit{GarageArea}, and \textit{GrLivArea}. These variables are relatively easy to interpret because they are directly connected with housing size, construction quality, garage functionality, and usable living space. Therefore, although Random Forest did not achieve the best overall test accuracy, it provided a useful balance between predictive performance and interpretability.
+
+From a business analytics perspective, this distinction is important. The purpose of business analytics is not only to build accurate models, but also to support better decisions. In housing markets, predictions become more useful when they can be connected with understandable property characteristics. For example, a real estate analyst may want to know whether a model assigns a high valuation because of house size, renovation quality, neighborhood effects, or other specific variables. A mortgage lender may need to check whether the valuation is driven by stable housing characteristics rather than noisy patterns in the dataset. In these situations, explainability improves the practical usefulness of the model.
+
+For banks and mortgage lenders, explainability is closely related to collateral risk. In mortgage lending, property value affects the loan-to-value ratio and the lender's potential exposure if a borrower defaults. If an automated valuation model overestimates a property value, the bank may underestimate the underlying lending risk. A model that only provides a numerical prediction does not fully support this type of assessment. By contrast, SHAP explanations can show whether the valuation is mainly influenced by variables such as total floor area, construction quality, garage capacity, or building age.
+
+The local SHAP explanations in this study are especially relevant in this context. In the best prediction example discussed in Chapter 5, the Random Forest model assigned a high predicted value mainly because the property had a large \textit{TotalSF} and relatively high \textit{OverallQual}. In the more typical case, the model balanced moderate negative effects with positive contributions from basement and garage-related variables. In the worst prediction case, the valuation decreased because several negative characteristics appeared together, including smaller total floor area, lower overall quality, older building age, and \textit{CentralAir\_Y = 0}. These explanations do not eliminate uncertainty, but they make the prediction process easier to inspect. For mortgage analysts, this type of information may help determine whether an automated estimate appears reasonable or whether additional manual review is needed.
+
+This also has implications for mortgage underwriting. In practice, interpretability becomes especially important in unusual cases where the model may overestimate or underestimate the property value. The worst-case SHAP example showed that the model strongly penalized properties with several negative features occurring together. In some situations this may be justified, but in other cases the property may contain advantages that are not captured in the structured dataset, such as recent undocumented renovations or favorable micro-location characteristics. Therefore, explainable outputs may help lenders decide when automated estimates should be reviewed by human experts.
+
+The findings are also relevant for real estate platforms and Automated Valuation Models (AVMs). Online property platforms often use automated estimates to support listing recommendations, pricing suggestions, and user-facing valuation tools. In these environments, predictive accuracy is important, but user trust is also important. A predicted value without explanation may be difficult for buyers or sellers to accept, especially when the estimated price differs from their expectations. SHAP explanations can improve transparency by showing which variables contribute positively or negatively to the final prediction. For example, a platform could explain that a higher valuation is mainly associated with larger \textit{TotalSF} and stronger \textit{OverallQual}, while lower valuations may be linked to older property age or weaker garage-related characteristics.
+
+For real estate platforms, there is also a trade-off between predictive performance and interpretability. XGBoost achieved the best accuracy in this study and may therefore be attractive for large-scale recommendation systems. However, the Random Forest model produced clearer global and local SHAP explanations. This suggests that the preferred model may depend on the final business objective. If the main goal is maximizing predictive accuracy, XGBoost may be preferred. If transparency and explanation quality are more important, Random Forest may be more suitable. In practice, organizations may even combine multiple models for different purposes.
+
+The results are also relevant for investors and homeowners. The Random Forest SHAP analysis showed that housing size, construction quality, garage functionality, living area, and age-related variables were among the most important predictors of housing value. This suggests that property value depends not only on location, but also on combinations of structural and quality-related characteristics. Investors may use this type of information when evaluating renovation opportunities or comparing properties. Homeowners may also better understand which housing features are associated with higher predicted market value.
+
+For example, the importance of \textit{OverallQual} suggests that construction and finish quality play a major role in valuation. The importance of \textit{GarageCars} and \textit{GarageArea} suggests that functional housing characteristics also matter. Similarly, variables such as \textit{HouseAge} and \textit{RemodAge} indicate that age and renovation history influence predicted values. These findings may support renovation planning, although they should not be interpreted as direct causal effects.
+
+The findings may also have implications for public institutions and policy analysis. Housing valuation models can be used in taxation, housing market monitoring, and urban planning. In these contexts, interpretability matters because public decisions often require transparency and accountability. If stakeholders cannot understand why a model produced a certain valuation, trust in the system may decrease. Explainable machine learning methods may therefore improve the transparency of automated valuation processes.
+
+From a practical perspective, the results of this study suggest that explainability may become increasingly important when machine learning models are used in financial or housing-related decisions. In this thesis, the Random Forest model produced explanations that were mainly driven by interpretable variables such as \textit{TotalSF}, \textit{OverallQual}, and \textit{GarageCars}. By contrast, the Neural Network model showed weaker predictive performance and a more fragmented SHAP structure. This difference matters because institutions may need to understand whether a predicted valuation is based on stable housing characteristics or on less transparent patterns in the data.
+
+This issue may also become more relevant in the European context, where discussions about AI transparency and human oversight are becoming more common. Although this thesis does not provide a legal analysis of the European AI Act or GDPR, the empirical results still highlight why explainability can matter in practice. In this study, XGBoost achieved the best predictive accuracy, but the Random Forest model provided explanations that were easier to connect with housing valuation logic. The SHAP analysis showed that the Random Forest predictions were mainly influenced by variables such as \textit{TotalSF}, \textit{OverallQual}, and garage-related features, which are relatively intuitive for housing analysts and non-technical users.
+
+At the same time, explainability should not be interpreted as a complete solution to all business and regulatory risks. SHAP explanations describe how the trained model uses variables, but they do not prove causal relationships. For example, a strong positive SHAP value for \textit{TotalSF} only means that the model associates larger floor area with higher predicted prices. It does not prove that increasing floor area would necessarily increase market value by the same amount. Therefore, SHAP should be treated mainly as an explanatory and diagnostic tool.
+
+Another issue is that housing datasets may contain variables that indirectly reflect broader socioeconomic differences between neighborhoods or property types. In this study, the Neural Network SHAP analysis relied more heavily on sparse categorical indicators, while the Random Forest model focused more on broad structural variables such as housing size and quality. This does not prove that one model is fairer than the other, but it suggests that model explanations should still be examined carefully when automated valuation systems are applied in sensitive financial settings.
+
+The results of this study also suggest that explainability may be useful not only during model development, but also during later model monitoring. If the importance of variables changes substantially over time, this may indicate data drift, unstable learning behavior, or changes in market conditions. Regular SHAP analysis could therefore help analysts verify whether the model continues to rely on meaningful housing variables such as \textit{TotalSF}, \textit{OverallQual}, and \textit{GrLivArea}.
+
+The robustness analysis in this study provides another practical insight. After removing \textit{TotalSF}, the Random Forest model maintained almost the same predictive performance. This suggests that the model did not depend entirely on a single engineered variable. From a practical perspective, this is useful because real-world datasets often contain missing or inconsistently defined variables. A model that relies too heavily on one feature may become fragile when data quality changes. The Random Forest robustness result therefore supports its potential usefulness in applied valuation systems.
+
+However, automated valuation models should still be used together with human judgment. Important housing characteristics such as interior condition, sunlight exposure, street aesthetics, noise levels, or undocumented renovations may not appear in structured tabular data. The worst-case SHAP example showed that the model may struggle when important information is missing or when several negative characteristics occur simultaneously. In practice, these cases may require additional expert review.
+
+Overall, the business implication of this study is that explainable machine learning models may improve the practical usefulness of housing price prediction systems. XGBoost achieved the best predictive accuracy, while Random Forest provided clearer explanation structures and stronger interpretability. In business contexts where predictions must be explained, reviewed, or audited, this balance becomes important. The findings therefore suggest that explainable tree-based models combined with SHAP analysis may support more transparent automated valuation systems.
+
+Finally, this thesis supports a decision-oriented view of model selection. The best model is not always the model with the lowest prediction error. Instead, the most suitable model depends on the intended use case. For internal forecasting tasks, XGBoost may be preferred because of its predictive accuracy. For explainable valuation tasks, Random Forest may provide greater transparency. Ridge Regression also remains useful as an interpretable baseline model. In high-stakes financial applications, predictive performance should ideally be combined with explainability, robustness checks, and human oversight. This perspective is consistent with the broader goals of business analytics, where the objective is not only to build accurate models, but also to support reliable and understandable decisions.
+
+
+\section{Limitations}
+
+Although this study provides useful findings on explainable machine learning for housing price prediction, several limitations should be acknowledged. These limitations do not mean that the results are invalid. Instead, they clarify the conditions under which the findings should be interpreted. The main limitations are related to the dataset, model selection, explainability analysis, and practical business application.
+
+The first limitation concerns the dataset. This study used the Ames Housing dataset, which represents one specific local housing market. Housing prices are strongly influenced by local conditions, such as neighborhood development, income level, school quality, transportation access, and buyer preferences. Therefore, the results from Ames may not directly apply to other housing markets, such as large metropolitan cities, European housing markets, or fast-growing urban areas. The findings are useful for understanding this dataset, but they should not be treated as universal conclusions about all housing markets.
+
+The dataset is also relatively small. After preprocessing and outlier removal, the final dataset contained 1,458 observations and 261 predictor variables after one-hot encoding. This was enough to compare several machine learning models, but it is still limited for more complex models. This is especially relevant for the Neural Network model. Neural Networks usually need larger datasets to learn stable patterns. Therefore, the poor performance of the Neural Network in this study should be understood in the context of the dataset size and structure. It does not mean that all Neural Network models are unsuitable for housing price prediction.
+
+Another limitation is that the dataset does not contain a rich time dimension. Housing markets change over time because of interest rates, inflation, employment conditions, construction costs, and policy changes. However, this study mainly used property-level information and did not include wider economic indicators. As a result, the models mainly learned relationships between housing characteristics and sale prices at the property level. They did not capture broader market changes over time.
+
+The dataset also contains limited location information. Although the variable \textit{Neighborhood} was included, it only provides a general location category. In real housing markets, very small location differences can strongly affect price. For example, two houses in the same neighborhood may have different values because one is closer to a school, park, public transport stop, or main road. Factors such as traffic noise, street condition, sunlight, view quality, and nearby facilities may also matter. These details were not available in the dataset, so the models could not fully capture micro-location effects.
+
+In addition, the dataset only contains structured tabular variables. It does not include property photos, floor plans, listing descriptions, street-view images, or detailed renovation notes. In practice, these types of information can influence how buyers evaluate a house. For example, a house may have a higher market value because of a modern interior, good natural light, attractive garden, or high-quality decoration. These features may not be fully reflected in the available variables. This limitation is especially important for unusual properties, where price may depend on details that are not recorded in the dataset.
+
+The second limitation relates to the models used in this study. The study compared Linear Regression, Ridge Regression, XGBoost, Random Forest, and a Neural Network. These models provide a useful comparison between simpler models, ensemble models, and a more complex neural model. However, the study did not test every possible model. Therefore, the model comparison is meaningful, but it is not exhaustive.
+
+Although XGBoost achieved the best predictive performance, it was used mainly as a benchmark model in this study. The main explainability analysis focused more on Random Forest because it provided stable performance and clearer SHAP explanations. This is a limitation because the best-performing model was not explored in the same level of interpretability detail. A more complete study could also apply global and local SHAP analysis to XGBoost and compare whether its explanations are as clear and stable as those of Random Forest.
+
+The Random Forest model was selected as the main explainable model, but it is still not completely transparent by itself. It is easier to interpret than the Neural Network, especially when combined with SHAP, but it is not as simple as a linear regression model. Random Forest contains many decision trees, so its predictions still require explanation tools to understand properly. Therefore, when this thesis describes Random Forest as explainable, it means that the model becomes interpretable through SHAP analysis, not that every part of the model is directly transparent.
+
+The Neural Network analysis also has limitations. This study used a standard Multi-Layer Perceptron model. More advanced Neural Network approaches for tabular data were not tested. It is possible that a different neural architecture or a better way of encoding categorical variables could improve performance. Therefore, the weak Neural Network result should be interpreted carefully. It shows that the specific Neural Network used in this study did not perform well, but it does not prove that all neural methods are unsuitable for housing data.
+
+The hyperparameter tuning process was also limited by time and computational cost. Grid search was used for Random Forest and Neural Network models, but the search range had to remain manageable. A wider search may have found slightly better model settings. This is particularly relevant for Neural Networks, because their performance can depend on many choices, such as the number of layers, number of neurons, learning rate, and regularization strength. However, the purpose of this thesis was not to search every possible model setting, but to compare model performance and explainability under a reasonable and reproducible setup.
+
+The third limitation concerns the interpretation method. SHAP was used to explain both global feature importance and local predictions. SHAP is useful because it shows how each feature contributes to model predictions. However, SHAP results should not be understood as causal effects. For example, if \textit{TotalSF} has a strong positive contribution, this means that the model associates larger total floor area with higher predicted prices. It does not prove that increasing total floor area would automatically cause the market price to increase by the same amount. SHAP explains the model's behavior, not the true causal structure of the housing market.
+
+This point is important because many housing variables are related to each other. For example, \textit{TotalSF}, \textit{GrLivArea}, basement area, garage area, and number of rooms all describe different aspects of house size and capacity. Because these variables overlap, the importance assigned to one feature may partly reflect information that is also contained in other variables. The robustness check showed that the Random Forest model still performed almost the same after removing \textit{TotalSF}. This suggests that the model could use related variables to recover similar information. However, it also means that feature importance should be interpreted with care.
+
+The SHAP results for the Neural Network should also be treated with caution. Since the Neural Network performed poorly on the test set, its feature explanations are less useful for drawing practical conclusions about housing prices. From a business analytics perspective, model explanations are useful only when the underlying predictions are reasonably reliable. A poor model can still be explained technically, but its explanations may not represent stable or meaningful market patterns. Therefore, the Neural Network SHAP results were used mainly as a comparison with Random Forest, rather than as the main source of business interpretation.
+
+The local SHAP analysis also has a limited scope. It examined only three representative Random Forest cases: the best prediction case, the typical prediction case, and the worst prediction case. These examples were helpful for showing how the model explained individual predictions. However, three cases cannot represent every type of property in the dataset. More local cases would be needed to understand how the model behaves for luxury houses, older houses, newly built houses, low-quality houses, and different neighborhoods.
+
+The robustness check also focused only on one feature: \textit{TotalSF}. This was a useful test because \textit{TotalSF} was the most important Random Forest feature. However, the analysis did not test the removal of other important variables, such as \textit{OverallQual}, \textit{GarageCars}, \textit{GrLivArea}, or neighborhood indicators. It also did not test many alternative train-test splits or different preprocessing choices. Therefore, the robustness result supports the stability of the Random Forest model with respect to one key engineered variable, but it does not prove that the model would remain stable under every possible data change.
+
+The fourth limitation relates to practical business use. This study was conducted as an academic analysis, not as a full business deployment of an automated valuation model. In real use, a housing price prediction model would need more checks before being used by a bank, real estate platform, or public institution. For example, the organization would need to monitor data quality, update the model when market conditions change, check whether the model behaves fairly across different property groups, and decide when human review is needed. These practical steps were discussed in the implications section, but they were not tested directly in this thesis.
+
+Fairness was also not formally evaluated. Housing prices may reflect broader social and economic patterns, especially through neighborhood and property quality variables. This study examined which features were important for prediction, but it did not test whether the model treats different groups or areas fairly. The dataset also does not contain all information needed for a full fairness analysis. Therefore, fairness remains an important limitation, especially if such models are used in mortgage lending, insurance, or public policy decisions.
+
+This study also does not provide a legal evaluation of the models. Although the discussion mentioned the importance of transparency in modern AI governance, the thesis does not test whether the models comply with specific legal requirements such as GDPR, the European AI Act, or mortgage regulation. The regulatory discussion should therefore be understood as a business and ethical consideration, not as a legal conclusion. In real-world use, additional legal review and documentation would be needed.
+
+Finally, this study does not directly test whether users understand or trust the explanations. SHAP results make the model more transparent from an analytical perspective, but actual users may still find the explanations difficult to understand. For example, a data analyst may understand SHAP values, but a homeowner or buyer may need a simpler explanation. A mortgage officer may need a different explanation format than a data scientist. Therefore, the practical value of explainability depends not only on the method itself, but also on how the explanation is communicated.
+
+Overall, these limitations show that the findings should be interpreted as evidence from one structured housing dataset and one specific modeling framework. The study shows that XGBoost achieved the best predictive accuracy, while Random Forest provided strong interpretability and robustness in this setting. It also shows that the implemented Neural Network did not generalize well to this dataset. However, broader datasets, richer location information, additional model types, and practical deployment testing would be needed before drawing stronger conclusions for real-world automated valuation systems.
+
+
+\section{Future Research Directions}
+
+Based on the limitations discussed above, several directions could be explored in future research. These directions are not only technical extensions, but also practical improvements for building more reliable and useful housing price prediction systems.
+
+First, future studies could use larger and more diverse housing datasets. The Ames Housing dataset is useful for model comparison, but it represents one local housing market. A broader dataset covering different cities, regions, or countries would make the findings more generalizable. Housing markets differ greatly across locations. A model that works well in a smaller American city may not perform in the same way in large metropolitan areas, European cities, or rapidly changing housing markets. Using more diverse data would help test whether the conclusions of this study remain valid in different market environments.
+
+Second, future research could include more time-related and economic variables. This study mainly focused on property characteristics, such as size, quality, age, garage capacity, and neighborhood. However, housing prices are also affected by wider market conditions. Variables such as interest rates, inflation, employment conditions, mortgage availability, construction costs, and local income levels may improve prediction performance. Including these factors would allow future models to capture not only the characteristics of individual houses, but also the broader economic environment in which transactions take place.
+
+Third, future work could improve the spatial dimension of the analysis. In this study, location was mainly represented by the \textit{Neighborhood} variable. This is useful, but it is still a relatively broad measure. In real housing markets, small location differences can have large effects on price. Future research could include distance to schools, parks, public transport, shopping areas, city centers, highways, or other local amenities. Geographic information systems (GIS) or spatial data could be used to capture these location effects more precisely. This would make the model more realistic for applied housing valuation tasks.
+
+Fourth, future studies could include unstructured data sources. In real estate markets, buyers do not evaluate houses only through structured variables. They also look at photos, listing descriptions, floor plans, interior quality, garden condition, street appearance, and other visual or textual information. Future models could combine tabular data with property images or listing text to create a richer valuation system. This may be especially helpful for unusual properties, where standard numerical variables do not fully explain the final sale price.
+
+Fifth, future research could examine XGBoost in more detail. In this study, XGBoost achieved the best predictive performance, but the main explainability analysis focused on Random Forest. A useful extension would be to apply the same global and local SHAP analysis to XGBoost and compare its explanations with those of Random Forest. This would help answer an important practical question: whether the best predictive model can also provide explanations that are clear enough for business use. If XGBoost can offer both high accuracy and understandable explanations, it may be a strong candidate for automated valuation systems.
+
+Sixth, future work could test more machine learning models. This study compared several important models, including Linear Regression, Ridge Regression, XGBoost, Random Forest, and Neural Network. However, other models could also be explored. For example, LightGBM and CatBoost are often used for structured tabular data. Elastic Net could provide another regularized linear benchmark. More advanced Neural Network approaches designed for tabular data could also be tested. The purpose would not be to add models for complexity alone, but to better understand which types of models offer the best balance between accuracy, interpretability, and business usefulness.
+
+Seventh, future research could improve the Neural Network design. The Neural Network used in this study was a standard Multi-Layer Perceptron. Its poor performance does not mean that all neural approaches are unsuitable for housing price prediction. A different architecture, better regularization, or improved categorical encoding may lead to better results. For example, future studies could test embedding-based approaches for categorical variables or other neural models specifically designed for tabular data. This would provide a fairer assessment of whether deep learning can be useful in housing valuation when the model design is better matched to the data.
+
+Eighth, future studies could conduct a more complete robustness analysis. This study removed \textit{TotalSF} to test whether the Random Forest model depended too heavily on one engineered variable. The result showed that the model remained stable. However, future research could extend this idea by removing or modifying other important variables, such as \textit{OverallQual}, \textit{GarageCars}, \textit{GrLivArea}, or neighborhood indicators. Researchers could also test different train-test splits, alternative preprocessing methods, or different outlier removal rules. This would provide a more complete picture of model stability.
+
+Ninth, future research could examine fairness and bias more directly. Housing data may reflect social and economic inequalities, especially through neighborhood and property quality variables. If an automated valuation model is used in lending or public decision-making, it is important to understand whether the model creates unfair outcomes for certain groups or areas. Future studies could evaluate model behavior across different neighborhoods, price segments, or property types. This would help connect explainable machine learning with responsible business use.
+
+Tenth, future work could study how users understand model explanations. This thesis used SHAP to explain model predictions, but it did not test whether different users actually find these explanations clear or useful. A future study could examine how mortgage officers, real estate analysts, buyers, sellers, or homeowners interpret SHAP-based explanations. This would be valuable because explainability is not only a technical issue. It is also a communication issue. An explanation is useful only if the intended user can understand it and apply it in decision-making.
+
+Finally, future research could move closer to a real business deployment setting. A practical automated valuation model would require more than one-time model training and evaluation. It would need regular updates, data quality checks, monitoring of model performance over time, human review rules, and documentation for internal or regulatory purposes. Future work could design a more complete framework for implementing explainable housing price models in real estate platforms, banks, or public institutions. Such a framework would connect predictive modeling, explainability, business decision-making, and model governance.
+
+Overall, future research should continue to move beyond the question of which model predicts best. A more complete research direction would ask which model predicts accurately, explains clearly, remains stable under data changes, and can be responsibly used in business practice. This broader perspective is important for the development of explainable machine learning in housing price prediction.
+
+
+\chapter{Conclusion}
+
+This thesis investigated explainable machine learning for housing price prediction using the Ames Housing dataset. The study mainly focused on the comparison between a Random Forest  model and a Neural Network model, while Linear Regression, Ridge Regression, and XGBoost were included as benchmark models to provide additional performance reference points.
+
+The results showed that XGBoost achieved the best predictive accuracy, while Random Forest provided the strongest balance between accuracy, interpretability, and robustness. Although Random Forest was not the most accurate model, its SHAP explanations were easier to understand and more consistent with housing valuation logic. Key drivers such as total floor area, overall quality, garage capacity, and property age played a central role in its predictions.
+
+The Neural Network performed poorly in this study, despite tuning and regularization. This finding highlights an important point: more complex models do not automatically perform better on structured tabular data. Model choice should depend on the data structure and the purpose of the analysis, not only on model complexity.
+
+Overall, this study shows that explainability is an important part of housing price prediction. In business and financial contexts, a model should not only predict accurately, but also provide explanations that can support trust, review, and decision-making. For this dataset, Random Forest with SHAP explanations offered a practical example of how machine learning can be both predictive and interpretable.
+
+
+\clearpage
+\addcontentsline{toc}{chapter}{Bibliography}
+\begin{thebibliography}{99}
+\setlength{\itemsep}{0pt}
+
+\bibitem[Arshad et al.(2024)]{arshad2024}
+Arshad, M., Kandanur, P., Sonawani, S., Batool, L., and Habib, M. (2024).
+\textit{From Predictive Importance to Causality: Which Machine Learning Model Reflects Reality?}
+arXiv:2409.02130.
+
+\bibitem[Bachmann(2025)]{bachmann2025}
+Bachmann, S. (2025).
+\textit{Interpretable Machine Learning for the German Residential Rental Market}.
+Aestimum, 86, 25–46. doi:10.36253/aestim-16351.
+
+\bibitem[Baranzini(2010)]{baranzini2010}
+Baranzini, A. (2010).
+\textit{Hedonic Methods in Housing Markets: Pricing Environmental Amenities and Segregation}.
+Edward Elgar Publishing.
+
+\bibitem[Chen and Guestrin(2016)]{chen2016}
+Chen, T., and Guestrin, C. (2016).
+\textit{XGBoost: A Scalable Tree Boosting System}.
+Proceedings of the 22nd ACM SIGKDD. doi:10.1145/2939672.2939785.
+
+\bibitem[Hussain et al.(2025)]{hussain2025}
+Hussain, M. I., Munir, A., Mamun, M. S. I., Chowdhury, S. H., Uddin, N., and Hossain, M. M. (2025).
+\textit{A Transparent House Price Prediction Framework Using Ensemble Learning, Genetic Algorithm-Based Tuning, and ANOVA-Based Feature Analysis}.
+FinTech, 4(3), 33–33. doi:10.3390/fintech4030033.
+
+\bibitem[Maselli and Nesticò(2025)]{maselli2025}
+Maselli, G., and Nesticò, A. (2025).
+\textit{Machine Learning Algorithms and Explainable Artificial Intelligence for Property Valuation}.
+Real Estate, 2(3), 12–12. doi:10.3390/realestate2030012.
+
+\bibitem[Neves et al.(2024)]{neves2024}
+Neves, F. T., Aparicio, M., and Neto, M. de C. (2024).
+\textit{The Impacts of Open Data and Explainable AI on Real Estate Price Predictions in Smart Cities}.
+Applied Sciences. doi:10.3390/app14052209.
+
+\bibitem[Revathi and Devarajan(2025)]{revathi2025}
+Revathi, T., and Devarajan, S. (2025).
+\textit{A Robust Ensemble-Based Framework for House Price Estimation: Integrating XGBoost with SHAP and Web Deployment}.
+Available online at: \url{https://www.itm-conferences.org/articles/itmconf/abs/2025/10/itmconf_keis2025_01023/itmconf_keis2025_01023.html}.
+
+\bibitem[Sergoyan and Bezirganyan(2022)]{sergoyan2022}
+Sergoyan, H., and Bezirganyan, G. (2022).
+\textit{Automated Real Estate Valuation with Machine Learning: A Case Study on Apartment Sales in Yerevan}.
+Journal of Architectural and Engineering Research, 2, 83–91. doi:10.54338/27382656-2022.2-012.
+
+\bibitem[Stalder et al.(2025)]{stalder2025}
+Stalder, N., Mayer, M., Bourassa, S. C., and Hoesli, M. (2025).
+\textit{Isolating Location Value Using SHAP and Interaction Constraints}.
+SSRN. doi:10.2139/ssrn.5089118.
+
+\bibitem[Thanos et al.(2019)]{thanos2019}
+Thanos, S., Dubé, J., and Legros, D. (2019).
+\textit{Incorporating Comparable Sales in a Spatiotemporal Hedonic Model}.
+Journal of Real Estate Finance and Economics, 59, 123–150.
+
+\bibitem[Xu et al.(2021)]{xu2021}
+Xu, H., et al. (2021).
+\textit{When Are Deep Networks Really Better Than Decision Forests at Small Sample Sizes, and How?}
+arXiv preprint arXiv:2108.13637.
+
+\end{thebibliography}
+
+% =========================================================
+
+% List of Tables and Figures
+
+% =========================================================
+
+\clearpage
+
+\addcontentsline{toc}{chapter}{List of Tables}
+
+\listoftables
+
+\clearpage
+
+\addcontentsline{toc}{chapter}{List of Figures}
+
+\listoffigures
+
+
+\appendix
+\chapter{Implementation Summary}
+
+\section{Main Software and Libraries}
+
+The empirical analysis was implemented in Python. The main libraries used were \texttt{pandas}, \texttt{numpy}, \texttt{scikit-learn}, \texttt{xgboost}, \texttt{shap}, \texttt{matplotlib}, and \texttt{seaborn}.
+
+\section{Main Preprocessing Steps}
+
+The preprocessing workflow included removing the non-informative \texttt{Id} variable, removing extreme outliers, applying log transformation to \texttt{SalePrice}, handling missing values according to their meaning, constructing \texttt{HouseAge}, \texttt{RemodAge}, and \texttt{TotalSF}, and applying one-hot encoding to categorical variables.
+
+\section{Modeling Workflow}
+
+The dataset was split into training and testing sets using an 80:20 ratio with \texttt{random\_state = 42}. Random Forest and Neural Network models were tuned using \texttt{GridSearchCV} with 5-fold cross-validation. Linear Regression, Ridge Regression, and XGBoost were included as benchmark models.
+
+\section{Interpretability and Robustness Analysis}
+
+SHAP was used for global and local interpretability analysis. Local SHAP explanations were generated for the best, typical, and worst Random Forest prediction cases. A robustness check was conducted by removing \texttt{TotalSF} and retraining the Random Forest model using the same selected parameters.
+
+
+
+% =========================================================
+
+% Abstract
+
+% =========================================================
+
+\clearpage
+
+\chapter*{Abstract}
+
+\addcontentsline{toc}{chapter}{Abstract}
+
+This thesis examines explainable machine learning methods for housing price prediction using the Ames Housing dataset. The study mainly compares Random Forest and a Neural Network model, while Linear Regression, Ridge Regression, and XGBoost are included as benchmark models. The objective is to evaluate not only predictive accuracy, but also interpretability, robustness, and practical relevance for business decision-making.
+
+The results show that XGBoost achieved the best predictive performance on the hold-out test set. However, Random Forest provided the strongest balance between accuracy, interpretability, and robustness. SHAP analysis showed that Random Forest predictions were mainly driven by meaningful housing characteristics, including total floor area, overall quality, garage capacity, living area, and property age. In contrast, the Neural Network performed poorly and produced less stable explanations.
+
+The thesis concludes that explainability is an important part of housing price prediction, especially when model outputs may support financial or business decisions. Predictive accuracy alone is not sufficient in such contexts. Models should also provide understandable and stable explanations. For this dataset, Random Forest with SHAP offered a practical example of machine learning that is both predictive and interpretable.
+
+
+
+\end{document}
+
+
